@@ -134,11 +134,11 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid var(--card-border);
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid #e1e0db;
   border-radius: 999px;
-  background: #fff;
+  background: #ebeae5;
   color: var(--fg);
   cursor: pointer;
   box-shadow: var(--shadow);
@@ -162,8 +162,8 @@ a:hover {
 }
 
 .poll-sort-icon {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.6rem;
+  height: 1.6rem;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
