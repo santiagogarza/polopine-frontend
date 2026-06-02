@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { ResultsChart } from "./ResultsChart";
 import type { PollResults } from "../types";
 
@@ -36,5 +36,29 @@ describe("ResultsChart", () => {
     expect(redBar).toHaveStyle({ width: "60%" });
     expect(blueBar).toHaveStyle({ width: "40%" });
     expect(greenBar).toHaveStyle({ width: "0%" });
+  });
+
+  it("reveals switch affordance on hover for non-selected options", () => {
+    const onSwitchVote = vi.fn();
+    render(
+      <ResultsChart
+        results={sampleResults}
+        myOptionId="a"
+        onSwitchVote={onSwitchVote}
+      />,
+    );
+
+    expect(screen.getByText("Your vote")).toBeInTheDocument();
+
+    const blueRow = screen.getByText("Blue").closest(".results-row--switchable");
+    expect(blueRow).toBeTruthy();
+    fireEvent.mouseEnter(blueRow!);
+
+    const switchButton = screen.getByRole("button", {
+      name: "Vote for this instead",
+    });
+    fireEvent.click(switchButton);
+
+    expect(onSwitchVote).toHaveBeenCalledWith("b");
   });
 });
