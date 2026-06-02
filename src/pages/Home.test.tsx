@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { listPolls } from "../api";
@@ -66,6 +66,8 @@ describe("Home", () => {
     expect(screen.getByLabelText("Brand new: 30%")).toBeInTheDocument();
 
     const topBar = screen.getByTestId("voted-bar-b");
-    expect(topBar).toHaveStyle({ width: "70%" });
+    await waitFor(() => {
+      expect(topBar).toHaveStyle({ width: "70%" });
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Poll } from "../types";
@@ -26,6 +27,18 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
   const sorted = [...poll.options].sort((a, b) => b.votes - a.votes);
   const visible = sorted.slice(0, MAX_BARS);
   const hiddenCount = sorted.length - visible.length;
+  const [animateIn, setAnimateIn] = useState(false);
+
+  useEffect(() => {
+    let secondFrame = 0;
+    const firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => setAnimateIn(true));
+    });
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, []);
 
   return (
     <button
@@ -46,7 +59,7 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
           const rank = index + 1;
           const delay = `${index * STAGGER_MS}ms`;
           const fillStyle: CSSProperties = {
-            width: `${pct}%`,
+            width: animateIn ? `${pct}%` : "0%",
             animationDelay: delay,
             transitionDelay: delay,
           };

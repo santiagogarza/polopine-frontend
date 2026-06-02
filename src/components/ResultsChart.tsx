@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import type { PollResults } from "../types";
 
@@ -16,6 +17,21 @@ function percent(votes: number, total: number): number {
 
 export function ResultsChart({ results }: ResultsChartProps) {
   const { options, totalVotes } = results;
+  const [animateIn, setAnimateIn] = useState(false);
+
+  useEffect(() => {
+    // Two rAFs guarantee the browser paints with width: 0% on the first
+    // frame, then the second render transitions to the real width — which
+    // is what triggers the spring CSS transition.
+    let secondFrame = 0;
+    const firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => setAnimateIn(true));
+    });
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, []);
 
   return (
     <div className="results-chart" role="list" aria-label="Poll results">
@@ -24,7 +40,7 @@ export function ResultsChart({ results }: ResultsChartProps) {
         const rank = index + 1;
         const delay = `${index * STAGGER_MS}ms`;
         const fillStyle: CSSProperties = {
-          width: `${pct}%`,
+          width: animateIn ? `${pct}%` : "0%",
           animationDelay: delay,
           transitionDelay: delay,
         };

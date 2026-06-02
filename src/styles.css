@@ -419,9 +419,9 @@ input[type="text"]:focus {
   overflow: hidden;
 }
 
-@keyframes results-bar-grow {
+@keyframes results-bar-fade-in {
   from {
-    width: 0;
+    opacity: 0;
   }
 }
 
@@ -430,22 +430,14 @@ input[type="text"]:focus {
   background: var(--accent);
   border-radius: 999px;
   min-width: 0;
-  animation: results-bar-grow 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
   transition: width 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  @keyframes results-bar-grow {
-    from {
-      opacity: 0;
-    }
-  }
-
   .results-bar-fill {
-    animation-duration: 150ms;
-    animation-timing-function: ease;
-    animation-delay: 0ms !important;
     transition: none;
+    animation: results-bar-fade-in 150ms ease both;
+    animation-delay: 0ms !important;
   }
 }
 
