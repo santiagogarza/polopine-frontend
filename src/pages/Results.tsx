@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getPollResults } from "../api";
+import { getPollResults, vote as voteApi } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
 import type { PollResults } from "../types";
-import { hasVoted } from "../voted";
+import { getVotedOption, hasVoted, markVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -14,6 +14,8 @@ export function Results() {
   const [results, setResults] = useState<PollResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [allowed, setAllowed] = useState(false);
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [changingVote, setChangingVote] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -22,7 +24,15 @@ export function Results() {
       return;
     }
     setAllowed(hasVoted(id));
+    setSelectedOptionId(getVotedOption(id));
   }, [id]);
+
+  const fetchResults = useCallback(async (pollId: string) => {
+    const data = await getPollResults(pollId);
+    setResults(data);
+    setError(null);
+    return data;
+  }, []);
 
   useEffect(() => {
     if (!id || !allowed) {
@@ -32,13 +42,9 @@ export function Results() {
     const pollId = id;
     let cancelled = false;
 
-    async function fetchResults() {
+    async function load() {
       try {
-        const data = await getPollResults(pollId);
-        if (!cancelled) {
-          setResults(data);
-          setError(null);
-        }
+        await fetchResults(pollId);
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -48,16 +54,35 @@ export function Results() {
       }
     }
 
-    void fetchResults();
+    void load();
     const intervalId = window.setInterval(() => {
-      void fetchResults();
+      void load();
     }, POLL_INTERVAL_MS);
 
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [id, allowed]);
+  }, [id, allowed, fetchResults]);
+
+  async function handleChangeVote(optionId: string) {
+    if (!id || changingVote || optionId === selectedOptionId) {
+      return;
+    }
+
+    setChangingVote(true);
+    setError(null);
+    try {
+      await voteApi(id, optionId);
+      markVoted(id, optionId);
+      setSelectedOptionId(optionId);
+      await fetchResults(id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to change vote");
+    } finally {
+      setChangingVote(false);
+    }
+  }
 
   if (!id) {
     return (
@@ -120,7 +145,18 @@ export function Results() {
 
       <SharePollBar pollId={id} showVotedNotice />
 
-      <ResultsChart results={results} />
+      {error ? (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <ResultsChart
+        results={results}
+        selectedOptionId={selectedOptionId}
+        onChangeVote={selectedOptionId ? handleChangeVote : undefined}
+        changingVote={changingVote}
+      />
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>

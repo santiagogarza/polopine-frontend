@@ -98,7 +98,7 @@ describe("Vote", () => {
 
     await waitFor(() => {
       expect(mockVoteApi).toHaveBeenCalledWith("poll-1", "opt-red");
-      expect(mockMarkVoted).toHaveBeenCalledWith("poll-1");
+      expect(mockMarkVoted).toHaveBeenCalledWith("poll-1", "opt-red");
       expect(navigate).toHaveBeenCalledWith("/poll/poll-1/results");
     });
   });

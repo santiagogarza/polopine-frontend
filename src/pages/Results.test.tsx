@@ -1,15 +1,17 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getPollResults } from "../api";
+import { getPollResults, vote as voteApi } from "../api";
 import type { PollResults } from "../types";
 import { Results } from "./Results";
 
 vi.mock("../api", () => ({
   getPollResults: vi.fn(),
+  vote: vi.fn(),
 }));
 
 const mockGetPollResults = vi.mocked(getPollResults);
+const mockVoteApi = vi.mocked(voteApi);
 
 const sampleResults: PollResults = {
   question: "Favorite color?",
@@ -46,7 +48,7 @@ describe("Results", () => {
   });
 
   it("loads and displays results when user has voted", async () => {
-    localStorage.setItem("polopine:voted:poll-1", "1");
+    localStorage.setItem("polopine:voted:poll-1", "opt-red");
     mockGetPollResults.mockResolvedValue(sampleResults);
 
     renderResults();
@@ -54,6 +56,43 @@ describe("Results", () => {
     expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
     expect(screen.getByText(/2 votes total/)).toBeInTheDocument();
     expect(mockGetPollResults).toHaveBeenCalledWith("poll-1");
+    expect(screen.getByText("Your vote")).toBeInTheDocument();
+  });
+
+  it("changes vote when user picks a different option", async () => {
+    localStorage.setItem("polopine:voted:poll-1", "opt-red");
+    mockGetPollResults.mockResolvedValue(sampleResults);
+    mockVoteApi.mockResolvedValue({
+      id: "poll-1",
+      question: "Favorite color?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      options: [
+        { id: "opt-red", text: "Red", votes: 1 },
+        { id: "opt-blue", text: "Blue", votes: 1 },
+      ],
+    });
+    mockGetPollResults
+      .mockResolvedValueOnce(sampleResults)
+      .mockResolvedValueOnce({
+        ...sampleResults,
+        options: [
+          { id: "opt-red", text: "Red", votes: 1 },
+          { id: "opt-blue", text: "Blue", votes: 1 },
+        ],
+      });
+
+    renderResults();
+
+    expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Vote for Blue instead/i }),
+    );
+
+    await waitFor(() => {
+      expect(mockVoteApi).toHaveBeenCalledWith("poll-1", "opt-blue");
+      expect(localStorage.getItem("polopine:voted:poll-1")).toBe("opt-blue");
+    });
   });
 
   it("shows error when results fetch fails", async () => {

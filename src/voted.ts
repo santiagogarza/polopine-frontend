@@ -4,11 +4,20 @@ const PREFIX = "polopine:voted:";
 const KEY = (id: string) => `${PREFIX}${id}`;
 
 export function hasVoted(id: string): boolean {
-  return localStorage.getItem(KEY(id)) === "1";
+  const value = localStorage.getItem(KEY(id));
+  return value !== null && value.length > 0;
 }
 
-export function markVoted(id: string): void {
-  localStorage.setItem(KEY(id), "1");
+export function markVoted(id: string, optionId: string): void {
+  localStorage.setItem(KEY(id), optionId);
+}
+
+export function getVotedOption(id: string): string | null {
+  const value = localStorage.getItem(KEY(id));
+  if (!value || value === "1") {
+    return null;
+  }
+  return value;
 }
 
 export function clearVoted(id: string): void {

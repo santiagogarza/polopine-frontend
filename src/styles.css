@@ -374,6 +374,64 @@ input[type="text"]:focus {
   gap: 1.25rem;
 }
 
+.results-row {
+  position: relative;
+  border-radius: var(--radius);
+  padding: 0.35rem 0.5rem;
+  margin: 0 -0.5rem;
+  transition: background 0.15s ease;
+}
+
+.results-row--selected {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.results-row--changeable {
+  cursor: pointer;
+}
+
+.results-your-vote {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.results-change-vote {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.15rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.results-row--changeable:hover .results-change-vote,
+.results-row--affordance-visible .results-change-vote {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.results-change-vote:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.results-change-vote:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 .results-row-header {
   display: flex;
   justify-content: space-between;
