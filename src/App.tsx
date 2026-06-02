@@ -6,8 +6,10 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import { HomeResetGate } from "./components/HomeResetGate";
+import { ResetMyView } from "./components/ResetMyView";
+import { Admin } from "./pages/Admin";
 import { CreatePoll } from "./pages/CreatePoll";
-import { Home } from "./pages/Home";
 import { Results } from "./pages/Results";
 import { Vote } from "./pages/Vote";
 
@@ -38,7 +40,9 @@ export function App() {
         <AppHeader />
         <main className="app-main">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomeResetGate />} />
+            <Route path="/reset-me" element={<ResetMyView />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/create" element={<CreatePoll />} />
             <Route path="/poll/:id" element={<Vote />} />
             <Route path="/poll/:id/results" element={<Results />} />
