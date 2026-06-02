@@ -18,13 +18,14 @@ describe("VotedPollCard", () => {
       id: "poll-1",
       question: "Ranked?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [
-        { id: "o1", text: "One", votes: 1 },
-        { id: "o2", text: "Two", votes: 5 },
-        { id: "o3", text: "Three", votes: 3 },
-        { id: "o4", text: "Four", votes: 2 },
-        { id: "o5", text: "Five", votes: 4 },
-        { id: "o6", text: "Six", votes: 0 },
+        { id: "o1", text: "One", votes: 1, authorVoterId: null },
+        { id: "o2", text: "Two", votes: 5, authorVoterId: null },
+        { id: "o3", text: "Three", votes: 3, authorVoterId: null },
+        { id: "o4", text: "Four", votes: 2, authorVoterId: null },
+        { id: "o5", text: "Five", votes: 4, authorVoterId: null },
+        { id: "o6", text: "Six", votes: 0, authorVoterId: null },
       ],
     };
 
@@ -41,9 +42,10 @@ describe("VotedPollCard", () => {
       id: "poll-zero",
       question: "No votes?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [
-        { id: "a", text: "A", votes: 0 },
-        { id: "b", text: "B", votes: 0 },
+        { id: "a", text: "A", votes: 0, authorVoterId: null },
+        { id: "b", text: "B", votes: 0, authorVoterId: null },
       ],
     };
 

@@ -7,9 +7,9 @@ const sampleResults: PollResults = {
   question: "Favorite color?",
   totalVotes: 10,
   options: [
-    { id: "a", text: "Red", votes: 6 },
-    { id: "b", text: "Blue", votes: 4 },
-    { id: "c", text: "Green", votes: 0 },
+    { id: "a", text: "Red", votes: 6, authorVoterId: null },
+    { id: "b", text: "Blue", votes: 4, authorVoterId: null },
+    { id: "c", text: "Green", votes: 0, authorVoterId: null },
   ],
 };
 

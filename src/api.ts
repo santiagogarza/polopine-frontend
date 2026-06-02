@@ -43,6 +43,55 @@ export async function getPoll(id: string): Promise<Poll> {
   return parseJson<Poll>(response);
 }
 
+export async function addOption(pollId: string, text: string): Promise<Poll> {
+  const response = await fetch(
+    `${API_URL}/polls/${encodeURIComponent(pollId)}/options`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-voter-id": getOrCreateVoterId(),
+      },
+      body: JSON.stringify({ text }),
+    },
+  );
+  return parseJson<Poll>(response);
+}
+
+export async function adminDeleteOption(
+  pollId: string,
+  optionId: string,
+  adminKey: string,
+): Promise<Poll> {
+  const response = await fetch(
+    `${API_URL}/polls/${encodeURIComponent(pollId)}/options/${encodeURIComponent(optionId)}`,
+    {
+      method: "DELETE",
+      headers: adminHeaders(adminKey),
+    },
+  );
+  return parseJson<Poll>(response);
+}
+
+export async function adminSetAllowVoterOptions(
+  pollId: string,
+  allowVoterOptions: boolean,
+  adminKey: string,
+): Promise<Poll> {
+  const response = await fetch(
+    `${API_URL}/polls/${encodeURIComponent(pollId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        ...adminHeaders(adminKey),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ allowVoterOptions }),
+    },
+  );
+  return parseJson<Poll>(response);
+}
+
 export async function vote(pollId: string, optionId: string): Promise<Poll> {
   const response = await fetch(
     `${API_URL}/polls/${encodeURIComponent(pollId)}/vote`,

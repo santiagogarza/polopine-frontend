@@ -363,6 +363,76 @@ input[type="text"]:focus {
   font-size: 1.05rem;
 }
 
+.option-card-attribution {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--fg-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.option-card:hover .option-card-attribution,
+.option-card:focus-visible .option-card-attribution {
+  opacity: 1;
+}
+
+.add-option-section {
+  margin-top: 1.25rem;
+}
+
+.add-option-trigger {
+  font-size: 0.95rem;
+  color: var(--fg-muted);
+}
+
+.add-option-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 28rem;
+}
+
+.add-option-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--card-03);
+  border-radius: var(--radius);
+  font: inherit;
+  background: #fff;
+  color: var(--fg);
+}
+
+.add-option-counter {
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+
+.add-option-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.add-option-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .page-footer-link {
   margin-top: 2rem;
   font-size: 0.95rem;
@@ -688,6 +758,46 @@ input[type="text"]:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.admin-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+
+.admin-option-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-option-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.4rem;
+  background: var(--card-01);
+}
+
+.admin-option-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.admin-option-meta {
+  margin-left: 0.5rem;
+  font-weight: 400;
+  color: var(--fg-muted);
 }
 
 .btn-sm {

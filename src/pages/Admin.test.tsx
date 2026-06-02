@@ -13,7 +13,9 @@ import { Admin } from "./Admin";
 vi.mock("../api", () => ({
   listPolls: vi.fn(),
   adminDeletePoll: vi.fn(),
+  adminDeleteOption: vi.fn(),
   adminResetPollVotes: vi.fn(),
+  adminSetAllowVoterOptions: vi.fn(),
   adminResetAll: vi.fn(),
 }));
 
@@ -27,9 +29,10 @@ const samplePolls: Poll[] = [
     id: "poll-1",
     question: "Demo poll?",
     createdAt: "2026-01-01T00:00:00.000Z",
+    allowVoterOptions: true,
     options: [
-      { id: "a", text: "A", votes: 1 },
-      { id: "b", text: "B", votes: 0 },
+      { id: "a", text: "A", votes: 1, authorVoterId: null },
+      { id: "b", text: "B", votes: 0, authorVoterId: null },
     ],
   },
 ];
@@ -119,8 +122,8 @@ describe("Admin", () => {
     mockAdminResetPollVotes.mockResolvedValue({
       ...samplePolls[0],
       options: [
-        { id: "a", text: "A", votes: 0 },
-        { id: "b", text: "B", votes: 0 },
+        { id: "a", text: "A", votes: 0, authorVoterId: null },
+        { id: "b", text: "B", votes: 0, authorVoterId: null },
       ],
     });
 

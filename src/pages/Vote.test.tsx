@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getPoll, vote as voteApi } from "../api";
+import { addOption as addOptionApi, getPoll, vote as voteApi } from "../api";
 import type { Poll } from "../types";
 import { markVoted } from "../voted";
 import { Vote } from "./Vote";
@@ -19,6 +19,7 @@ vi.mock("react-router-dom", async (importOriginal) => {
 vi.mock("../api", () => ({
   getPoll: vi.fn(),
   vote: vi.fn(),
+  addOption: vi.fn(),
 }));
 
 vi.mock("../voted", async (importOriginal) => {
@@ -31,15 +32,17 @@ vi.mock("../voted", async (importOriginal) => {
 
 const mockGetPoll = vi.mocked(getPoll);
 const mockVoteApi = vi.mocked(voteApi);
+const mockAddOptionApi = vi.mocked(addOptionApi);
 const mockMarkVoted = vi.mocked(markVoted);
 
 const samplePoll: Poll = {
   id: "poll-1",
   question: "Favorite color?",
   createdAt: "2026-01-01T00:00:00.000Z",
+  allowVoterOptions: true,
   options: [
-    { id: "opt-red", text: "Red", votes: 0 },
-    { id: "opt-blue", text: "Blue", votes: 0 },
+    { id: "opt-red", text: "Red", votes: 0, authorVoterId: null },
+    { id: "opt-blue", text: "Blue", votes: 0, authorVoterId: null },
   ],
 };
 
@@ -85,8 +88,8 @@ describe("Vote", () => {
     mockVoteApi.mockResolvedValue({
       ...samplePoll,
       options: [
-        { id: "opt-red", text: "Red", votes: 1 },
-        { id: "opt-blue", text: "Blue", votes: 0 },
+        { id: "opt-red", text: "Red", votes: 1, authorVoterId: null },
+        { id: "opt-blue", text: "Blue", votes: 0, authorVoterId: null },
       ],
     });
 
@@ -101,6 +104,61 @@ describe("Vote", () => {
       expect(mockMarkVoted).toHaveBeenCalledWith("poll-1");
       expect(navigate).toHaveBeenCalledWith("/poll/poll-1/results");
     });
+  });
+
+  it("adds an option optimistically then replaces with server poll", async () => {
+    localStorage.setItem("polopine:voter-id", "voter-abc");
+    mockGetPoll.mockResolvedValue(samplePoll);
+    mockAddOptionApi.mockResolvedValue({
+      ...samplePoll,
+      options: [
+        ...samplePoll.options,
+        {
+          id: "opt-green",
+          text: "Green",
+          votes: 0,
+          authorVoterId: "voter-abc",
+        },
+      ],
+    });
+
+    renderVote();
+
+    expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Add option" }));
+    fireEvent.change(screen.getByLabelText("New option"), {
+      target: { value: "Green" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add option" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Green")).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(mockAddOptionApi).toHaveBeenCalledWith("poll-1", "Green");
+    });
+  });
+
+  it("rolls back and shows error when add option fails", async () => {
+    mockGetPoll.mockResolvedValue(samplePoll);
+    mockAddOptionApi.mockRejectedValue(new Error("Duplicate option"));
+
+    renderVote();
+
+    expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Add option" }));
+    fireEvent.change(screen.getByLabelText("New option"), {
+      target: { value: "Green" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add option" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Duplicate option",
+    );
+    expect(screen.queryByText("Green")).not.toBeInTheDocument();
   });
 
   it("shows error and re-enables options when vote fails", async () => {

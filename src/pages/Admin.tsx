@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  adminDeleteOption,
   adminDeletePoll,
   adminResetAll,
   adminResetPollVotes,
+  adminSetAllowVoterOptions,
   listPolls,
 } from "../api";
 import type { Poll } from "../types";
@@ -216,6 +218,59 @@ export function Admin() {
             {polls.map((poll) => (
               <li key={poll.id} className="admin-poll-row admin-poll-row-stack">
                 <span className="admin-poll-label">{poll.question}</span>
+                <label className="admin-toggle">
+                  <input
+                    type="checkbox"
+                    checked={poll.allowVoterOptions}
+                    disabled={busy}
+                    onChange={() =>
+                      void runServerAction(
+                        poll.allowVoterOptions
+                          ? `Voter-added options disabled on "${poll.question}".`
+                          : `Voter-added options enabled on "${poll.question}".`,
+                        async () => {
+                          await adminSetAllowVoterOptions(
+                            poll.id,
+                            !poll.allowVoterOptions,
+                            adminKey,
+                          );
+                        },
+                      )
+                    }
+                  />
+                  Allow voters to add options
+                </label>
+                <ul className="admin-option-list">
+                  {poll.options.map((option) => (
+                    <li key={option.id} className="admin-option-row">
+                      <span className="admin-option-label">
+                        {option.text}
+                        <span className="admin-option-meta">
+                          {option.votes} vote{option.votes === 1 ? "" : "s"}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy}
+                        onClick={() =>
+                          void runServerAction(
+                            `Removed option "${option.text}" from "${poll.question}".`,
+                            async () => {
+                              await adminDeleteOption(
+                                poll.id,
+                                option.id,
+                                adminKey,
+                              );
+                            },
+                          )
+                        }
+                      >
+                        Remove option
+                      </button>
+                    </li>
+                  ))}
+                </ul>
                 <div className="admin-poll-actions">
                   <button
                     type="button"
