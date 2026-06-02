@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { listPolls } from "../api";
@@ -19,6 +19,36 @@ const samplePolls: Poll[] = [
     options: [
       { id: "a", text: "Brand new", votes: 3 },
       { id: "b", text: "Over a year", votes: 7 },
+    ],
+  },
+];
+
+const multiPolls: Poll[] = [
+  {
+    id: "p-banana",
+    question: "Banana split?",
+    createdAt: "2026-06-01T10:00:00.000Z",
+    options: [
+      { id: "1", text: "Yes", votes: 2 },
+      { id: "2", text: "No", votes: 3 },
+    ],
+  },
+  {
+    id: "p-apple",
+    question: "Apple pie?",
+    createdAt: "2026-06-02T10:00:00.000Z",
+    options: [
+      { id: "1", text: "Yes", votes: 0 },
+      { id: "2", text: "No", votes: 2 },
+    ],
+  },
+  {
+    id: "p-cherry",
+    question: "Cherry cola?",
+    createdAt: "2026-06-03T10:00:00.000Z",
+    options: [
+      { id: "1", text: "Yes", votes: 10 },
+      { id: "2", text: "No", votes: 0 },
     ],
   },
 ];
@@ -67,5 +97,65 @@ describe("Home", () => {
 
     const topBar = screen.getByTestId("voted-bar-b");
     expect(topBar).toHaveStyle({ width: "70%" });
+  });
+
+  it("re-orders polls when a new sort option is chosen", async () => {
+    mockListPolls.mockResolvedValue(multiPolls);
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>,
+    );
+
+    await screen.findByText("Cherry cola?");
+
+    const list = screen.getByRole("list");
+    const initialQuestions = within(list)
+      .getAllByRole("button")
+      .map((btn) => btn.querySelector(".poll-card-question")?.textContent);
+    expect(initialQuestions).toEqual([
+      "Cherry cola?",
+      "Apple pie?",
+      "Banana split?",
+    ]);
+
+    fireEvent.click(screen.getByRole("button", { name: /Sort polls/ }));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "Alphabetical" }));
+
+    const sortedQuestions = within(screen.getByRole("list"))
+      .getAllByRole("button")
+      .map((btn) => btn.querySelector(".poll-card-question")?.textContent);
+    expect(sortedQuestions).toEqual([
+      "Apple pie?",
+      "Banana split?",
+      "Cherry cola?",
+    ]);
+  });
+
+  it("restores the persisted sort selection on reload", async () => {
+    localStorage.setItem("polopine:pollSort", "least-votes");
+    mockListPolls.mockResolvedValue(multiPolls);
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>,
+    );
+
+    await screen.findByText("Cherry cola?");
+
+    const questions = within(screen.getByRole("list"))
+      .getAllByRole("button")
+      .map((btn) => btn.querySelector(".poll-card-question")?.textContent);
+    expect(questions).toEqual([
+      "Apple pie?",
+      "Banana split?",
+      "Cherry cola?",
+    ]);
+
+    expect(
+      screen.getByRole("button", { name: /current: Least votes/ }),
+    ).toBeInTheDocument();
   });
 });

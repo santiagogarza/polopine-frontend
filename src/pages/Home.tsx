@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { listPolls } from "../api";
 import { JoinQR } from "../components/JoinQR";
+import { PollSortMenu } from "../components/PollSortMenu";
 import { VotedPollCard } from "../components/VotedPollCard";
+import { loadSort, saveSort, sortPolls, type SortOption } from "../pollSort";
 import type { Poll } from "../types";
 import { hasVoted } from "../voted";
 
@@ -10,11 +12,16 @@ function totalVotes(poll: Poll): number {
   return poll.options.reduce((sum, option) => sum + option.votes, 0);
 }
 
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => unknown;
+};
+
 export function Home() {
   const navigate = useNavigate();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortOption>(() => loadSort());
 
   useEffect(() => {
     let cancelled = false;
@@ -52,11 +59,28 @@ export function Home() {
     };
   }, []);
 
+  const sortedPolls = useMemo(() => sortPolls(polls, sort), [polls, sort]);
+
+  function handleSortChange(next: SortOption) {
+    saveSort(next);
+    const doc = document as ViewTransitionDocument;
+    if (typeof doc.startViewTransition === "function") {
+      doc.startViewTransition(() => {
+        setSort(next);
+      });
+    } else {
+      setSort(next);
+    }
+  }
+
   return (
     <section className="page page-home">
       <JoinQR />
 
-      <h2 className="home-section-title">Polls</h2>
+      <div className="home-section-header">
+        <h2 className="home-section-title">Polls</h2>
+        <PollSortMenu value={sort} onChange={handleSortChange} />
+      </div>
 
       {loading ? <p className="page-lead">Loading recent polls…</p> : null}
 
@@ -66,16 +90,19 @@ export function Home() {
         </p>
       ) : null}
 
-      {!loading && !error && polls.length === 0 ? (
+      {!loading && !error && sortedPolls.length === 0 ? (
         <p className="home-empty">No polls yet. Be the first to create one.</p>
       ) : null}
 
-      {!loading && !error && polls.length > 0 ? (
+      {!loading && !error && sortedPolls.length > 0 ? (
         <ul className="poll-list">
-          {polls.map((poll) => {
+          {sortedPolls.map((poll) => {
+            const itemStyle: CSSProperties = {
+              viewTransitionName: `poll-${poll.id}`,
+            };
             if (hasVoted(poll.id)) {
               return (
-                <li key={poll.id}>
+                <li key={poll.id} className="poll-list-item" style={itemStyle}>
                   <VotedPollCard poll={poll} />
                 </li>
               );
@@ -84,7 +111,7 @@ export function Home() {
             const optionCount = poll.options.length;
             const votes = totalVotes(poll);
             return (
-              <li key={poll.id}>
+              <li key={poll.id} className="poll-list-item" style={itemStyle}>
                 <button
                   type="button"
                   className="poll-card"

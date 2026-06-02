@@ -106,15 +106,113 @@ a:hover {
   margin-top: 0;
 }
 
-.home-section-title {
+.home-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   margin: 0 0 1rem;
+}
+
+.page-home > .home-section-header {
+  margin-top: 0;
+}
+
+.home-section-title {
+  margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
 }
 
-.page-home > .home-section-title {
-  margin-top: 0;
+.poll-sort {
+  position: relative;
+  display: inline-flex;
 }
+
+.poll-sort-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in srgb, var(--fg) 45%, transparent);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.poll-sort-trigger:hover,
+.poll-sort-trigger:focus-visible,
+.poll-sort-trigger[aria-expanded="true"] {
+  color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+
+.poll-sort-trigger:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  outline-offset: 1px;
+}
+
+.poll-sort-icon {
+  display: block;
+}
+
+.poll-sort-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 20;
+  min-width: 11rem;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgb(38 37 30 / 12%);
+}
+
+.poll-sort-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.poll-sort-option:hover,
+.poll-sort-option:focus-visible {
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  outline: none;
+}
+
+.poll-sort-option-selected {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.poll-sort-option-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
 
 .home-empty {
   margin: 0;
