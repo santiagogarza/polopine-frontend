@@ -13,6 +13,7 @@ const mockGetPollResults = vi.mocked(getPollResults);
 
 const sampleResults: PollResults = {
   question: "Favorite color?",
+  accentColor: "teal",
   totalVotes: 2,
   options: [
     { id: "opt-red", text: "Red", votes: 2 },

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { PollAccentScope } from "./PollAccentScope";
 import type { Poll } from "../types";
 
 interface VotedPollCardProps {
@@ -26,6 +27,7 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
   const hiddenCount = sorted.length - visible.length;
 
   return (
+    <PollAccentScope accentColor={poll.accentColor}>
     <button
       type="button"
       className="voted-card"
@@ -77,5 +79,6 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
         ) : null}
       </div>
     </button>
+    </PollAccentScope>
   );
 }

@@ -4,6 +4,7 @@
   --fg: #26251e;
   --fg-muted: color-mix(in srgb, var(--fg) 60%, transparent);
   --accent: #f54e00;
+  --accent-dark: #ff6b1a;
   --card: #f2f1ed;
   --card-border: #e6e5e0;
   --radius: 10px;
@@ -19,6 +20,64 @@
   font-weight: 400;
   color: var(--fg);
   background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #14120b;
+    --fg: #edecec;
+    --fg-muted: color-mix(in srgb, var(--fg) 60%, transparent);
+    --card: #1b1913;
+    --card-border: #26241e;
+    --shadow: 0 1px 2px rgb(0 0 0 / 35%);
+  }
+
+  .option-card,
+  .voted-card,
+  .poll-card {
+    background: #201e18;
+  }
+
+  input[type="text"] {
+    background: #201e18;
+    border-color: var(--card-border);
+  }
+
+  .voted-card-check {
+    background: color-mix(in srgb, var(--accent) 18%, var(--card));
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .poll-accent a {
+    color: var(--accent-dark);
+  }
+
+  .poll-accent a:hover {
+    color: var(--accent-dark);
+  }
+
+  .poll-accent .results-bar-fill {
+    background: var(--accent-dark);
+  }
+
+  .poll-accent .voted-card-check {
+    background: color-mix(in srgb, var(--accent-dark) 18%, var(--card));
+    color: var(--accent-dark);
+  }
+}
+
+.poll-accent a:hover {
+  color: var(--accent);
+}
+
+.poll-accent .option-card:hover:not(:disabled) {
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.poll-accent .voted-card:hover {
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 *,
@@ -197,6 +256,78 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.accent-picker-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.accent-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.accent-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius);
+}
+
+.accent-swatch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.accent-swatch-dot {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.1s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.accent-swatch-selected .accent-swatch-dot {
+  border-color: var(--fg);
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--fg);
+}
+
+.accent-swatch-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-align: center;
+  max-width: 3.5rem;
+  line-height: 1.2;
+}
+
+.accent-swatch-selected .accent-swatch-label {
+  color: var(--fg);
+}
+
+.accent-picker-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+  line-height: 1.45;
 }
 
 .field,

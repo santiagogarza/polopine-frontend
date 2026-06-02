@@ -1,11 +1,14 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPoll } from "../api";
+import { AccentColorPicker } from "../components/AccentColorPicker";
+import { DEFAULT_ACCENT_COLOR, type AccentColor } from "../accentColors";
 
 export function CreatePoll() {
   const navigate = useNavigate();
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
+  const [accentColor, setAccentColor] = useState<AccentColor>(DEFAULT_ACCENT_COLOR);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -48,7 +51,11 @@ export function CreatePoll() {
 
     setSubmitting(true);
     try {
-      const poll = await createPoll(trimmedQuestion, trimmedOptions);
+      const poll = await createPoll(
+        trimmedQuestion,
+        trimmedOptions,
+        accentColor,
+      );
       navigate(`/poll/${poll.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create poll");
@@ -103,6 +110,8 @@ export function CreatePoll() {
             Add option
           </button>
         </fieldset>
+
+        <AccentColorPicker value={accentColor} onChange={setAccentColor} />
 
         {error ? (
           <p className="form-error" role="alert">

@@ -15,6 +15,7 @@ const samplePolls: Poll[] = [
   {
     id: "poll-1",
     question: "How much of a Cursor ninja are you?",
+    accentColor: "orange",
     createdAt: "2026-06-01T12:00:00.000Z",
     options: [
       { id: "a", text: "Brand new", votes: 3 },

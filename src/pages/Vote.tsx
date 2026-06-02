@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPoll, vote as voteApi } from "../api";
+import { PollAccentScope } from "../components/PollAccentScope";
 import { SharePollBar } from "../components/SharePollBar";
 import type { Poll } from "../types";
 import { hasVoted, markVoted } from "../voted";
@@ -105,31 +106,33 @@ export function Vote() {
   }
 
   return (
-    <section className="page">
-      <h1>{poll.question}</h1>
-      <p className="page-lead">Choose one option to cast your vote.</p>
+    <PollAccentScope accentColor={poll.accentColor} className="page">
+      <section className="page">
+        <h1>{poll.question}</h1>
+        <p className="page-lead">Choose one option to cast your vote.</p>
 
-      <SharePollBar pollId={id} />
+        <SharePollBar pollId={id} />
 
-      <div className="option-cards">
-        {poll.options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            className="option-card"
-            onClick={() => void handleVote(option.id)}
-            disabled={voting}
-          >
-            <span className="option-card-text">{option.text}</span>
-          </button>
-        ))}
-      </div>
+        <div className="option-cards">
+          {poll.options.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className="option-card"
+              onClick={() => void handleVote(option.id)}
+              disabled={voting}
+            >
+              <span className="option-card-text">{option.text}</span>
+            </button>
+          ))}
+        </div>
 
-      {error ? (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      ) : null}
-    </section>
+        {error ? (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </section>
+    </PollAccentScope>
   );
 }

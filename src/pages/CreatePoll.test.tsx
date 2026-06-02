@@ -67,10 +67,43 @@ describe("CreatePoll", () => {
     expect(removeButtons[1]).toBeDisabled();
   });
 
+  it("sends selected accent color when creating a poll", async () => {
+    mockCreatePoll.mockResolvedValue({
+      id: "new-poll",
+      question: "Color?",
+      accentColor: "violet",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      options: [
+        { id: "a", text: "A", votes: 0 },
+        { id: "b", text: "B", votes: 0 },
+      ],
+    });
+
+    renderCreate();
+
+    fireEvent.change(screen.getByPlaceholderText("What should we order for lunch?"), {
+      target: { value: "Color?" },
+    });
+    fireEvent.change(screen.getByLabelText("Option 1"), {
+      target: { value: "A" },
+    });
+    fireEvent.change(screen.getByLabelText("Option 2"), {
+      target: { value: "B" },
+    });
+    fireEvent.click(screen.getByRole("radio", { name: /Violet/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Create poll" }));
+
+    await waitFor(() => {
+      expect(mockCreatePoll).toHaveBeenCalledWith("Color?", ["A", "B"], "violet");
+    });
+  });
+
   it("navigates to new poll after successful create", async () => {
     mockCreatePoll.mockResolvedValue({
       id: "new-poll",
       question: "Lunch?",
+      accentColor: "orange",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "a", text: "Pizza", votes: 0 },
@@ -93,7 +126,7 @@ describe("CreatePoll", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create poll" }));
 
     await waitFor(() => {
-      expect(mockCreatePoll).toHaveBeenCalledWith("Lunch?", ["Pizza", "Salad"]);
+      expect(mockCreatePoll).toHaveBeenCalledWith("Lunch?", ["Pizza", "Salad"], "orange");
       expect(navigate).toHaveBeenCalledWith("/poll/new-poll");
     });
   });

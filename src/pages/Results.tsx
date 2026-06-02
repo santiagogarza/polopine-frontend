@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPollResults } from "../api";
+import { PollAccentScope } from "../components/PollAccentScope";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
 import type { PollResults } from "../types";
@@ -111,20 +112,22 @@ export function Results() {
   }
 
   return (
-    <section className="page">
-      <h1>{results.question}</h1>
-      <p className="page-lead">
-        Live results · {results.totalVotes}{" "}
-        {results.totalVotes === 1 ? "vote" : "votes"} total · updates every 2s
-      </p>
+    <PollAccentScope accentColor={results.accentColor} className="page">
+      <section className="page">
+        <h1>{results.question}</h1>
+        <p className="page-lead">
+          Live results · {results.totalVotes}{" "}
+          {results.totalVotes === 1 ? "vote" : "votes"} total · updates every 2s
+        </p>
 
-      <SharePollBar pollId={id} showVotedNotice />
+        <SharePollBar pollId={id} showVotedNotice />
 
-      <ResultsChart results={results} />
+        <ResultsChart results={results} />
 
-      <p className="page-footer-link">
-        <Link to="/">Back to polls</Link>
-      </p>
-    </section>
+        <p className="page-footer-link">
+          <Link to="/">Back to polls</Link>
+        </p>
+      </section>
+    </PollAccentScope>
   );
 }

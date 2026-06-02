@@ -36,6 +36,7 @@ const mockMarkVoted = vi.mocked(markVoted);
 const samplePoll: Poll = {
   id: "poll-1",
   question: "Favorite color?",
+  accentColor: "orange",
   createdAt: "2026-01-01T00:00:00.000Z",
   options: [
     { id: "opt-red", text: "Red", votes: 0 },

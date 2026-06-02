@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listPolls } from "../api";
 import { JoinQR } from "../components/JoinQR";
+import { PollAccentScope } from "../components/PollAccentScope";
 import { VotedPollCard } from "../components/VotedPollCard";
 import type { Poll } from "../types";
 import { hasVoted } from "../voted";
@@ -85,17 +86,19 @@ export function Home() {
             const votes = totalVotes(poll);
             return (
               <li key={poll.id}>
-                <button
-                  type="button"
-                  className="poll-card"
-                  onClick={() => navigate(`/poll/${poll.id}`)}
-                >
-                  <span className="poll-card-question">{poll.question}</span>
-                  <span className="poll-card-meta">
-                    {optionCount} {optionCount === 1 ? "option" : "options"} ·{" "}
-                    {votes} {votes === 1 ? "vote" : "votes"}
-                  </span>
-                </button>
+                <PollAccentScope accentColor={poll.accentColor}>
+                  <button
+                    type="button"
+                    className="poll-card"
+                    onClick={() => navigate(`/poll/${poll.id}`)}
+                  >
+                    <span className="poll-card-question">{poll.question}</span>
+                    <span className="poll-card-meta">
+                      {optionCount} {optionCount === 1 ? "option" : "options"} ·{" "}
+                      {votes} {votes === 1 ? "vote" : "votes"}
+                    </span>
+                  </button>
+                </PollAccentScope>
               </li>
             );
           })}

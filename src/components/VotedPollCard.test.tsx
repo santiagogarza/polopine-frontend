@@ -17,6 +17,7 @@ describe("VotedPollCard", () => {
     const poll: Poll = {
       id: "poll-1",
       question: "Ranked?",
+      accentColor: "blue",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "o1", text: "One", votes: 1 },
@@ -40,6 +41,7 @@ describe("VotedPollCard", () => {
     const poll: Poll = {
       id: "poll-zero",
       question: "No votes?",
+      accentColor: "blue",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "a", text: "A", votes: 0 },
