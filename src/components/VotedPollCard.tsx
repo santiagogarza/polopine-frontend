@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Poll } from "../types";
 
@@ -6,6 +7,7 @@ interface VotedPollCardProps {
 }
 
 const MAX_BARS = 4;
+const STAGGER_MS = 40;
 
 function totalVotes(poll: Poll): number {
   return poll.options.reduce((sum, option) => sum + option.votes, 0);
@@ -42,6 +44,12 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
         {visible.map((option, index) => {
           const pct = percent(option.votes, total);
           const rank = index + 1;
+          const delay = `${index * STAGGER_MS}ms`;
+          const fillStyle: CSSProperties = {
+            width: `${pct}%`,
+            animationDelay: delay,
+            transitionDelay: delay,
+          };
           return (
             <div key={option.id} className="voted-bar-row" role="listitem">
               <div className="voted-bar-header">
@@ -65,7 +73,7 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
               >
                 <div
                   className="results-bar-fill"
-                  style={{ width: `${pct}%` }}
+                  style={fillStyle}
                   data-testid={`voted-bar-${option.id}`}
                 />
               </div>

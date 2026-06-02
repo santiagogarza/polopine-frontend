@@ -37,4 +37,21 @@ describe("ResultsChart", () => {
     expect(blueBar).toHaveStyle({ width: "40%" });
     expect(greenBar).toHaveStyle({ width: "0%" });
   });
+
+  it("staggers bar animation/transition delays by 40ms per row", () => {
+    render(<ResultsChart results={sampleResults} />);
+
+    expect(screen.getByTestId("bar-a")).toHaveStyle({
+      animationDelay: "0ms",
+      transitionDelay: "0ms",
+    });
+    expect(screen.getByTestId("bar-b")).toHaveStyle({
+      animationDelay: "40ms",
+      transitionDelay: "40ms",
+    });
+    expect(screen.getByTestId("bar-c")).toHaveStyle({
+      animationDelay: "80ms",
+      transitionDelay: "80ms",
+    });
+  });
 });

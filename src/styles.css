@@ -419,12 +419,34 @@ input[type="text"]:focus {
   overflow: hidden;
 }
 
+@keyframes results-bar-grow {
+  from {
+    width: 0;
+  }
+}
+
 .results-bar-fill {
   height: 100%;
   background: var(--accent);
   border-radius: 999px;
   min-width: 0;
-  transition: width 0.4s ease;
+  animation: results-bar-grow 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: width 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes results-bar-grow {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .results-bar-fill {
+    animation-duration: 150ms;
+    animation-timing-function: ease;
+    animation-delay: 0ms !important;
+    transition: none;
+  }
 }
 
 .join-qr {

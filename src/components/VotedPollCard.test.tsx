@@ -53,4 +53,32 @@ describe("VotedPollCard", () => {
     expect(screen.getByLabelText("B: 0%")).toBeInTheDocument();
     expect(screen.getByTestId("voted-bar-a")).toHaveStyle({ width: "0%" });
   });
+
+  it("staggers visible bar animation delays by 40ms per row", () => {
+    const poll: Poll = {
+      id: "poll-stagger",
+      question: "Stagger?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      options: [
+        { id: "a", text: "A", votes: 3 },
+        { id: "b", text: "B", votes: 2 },
+        { id: "c", text: "C", votes: 1 },
+      ],
+    };
+
+    renderCard(poll);
+
+    expect(screen.getByTestId("voted-bar-a")).toHaveStyle({
+      animationDelay: "0ms",
+      transitionDelay: "0ms",
+    });
+    expect(screen.getByTestId("voted-bar-b")).toHaveStyle({
+      animationDelay: "40ms",
+      transitionDelay: "40ms",
+    });
+    expect(screen.getByTestId("voted-bar-c")).toHaveStyle({
+      animationDelay: "80ms",
+      transitionDelay: "80ms",
+    });
+  });
 });

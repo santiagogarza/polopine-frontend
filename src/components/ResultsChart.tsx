@@ -1,8 +1,11 @@
+import type { CSSProperties } from "react";
 import type { PollResults } from "../types";
 
 interface ResultsChartProps {
   results: PollResults;
 }
+
+const STAGGER_MS = 40;
 
 function percent(votes: number, total: number): number {
   if (total === 0) {
@@ -19,6 +22,12 @@ export function ResultsChart({ results }: ResultsChartProps) {
       {options.map((option, index) => {
         const pct = percent(option.votes, totalVotes);
         const rank = index + 1;
+        const delay = `${index * STAGGER_MS}ms`;
+        const fillStyle: CSSProperties = {
+          width: `${pct}%`,
+          animationDelay: delay,
+          transitionDelay: delay,
+        };
         return (
           <div key={option.id} className="results-row" role="listitem">
             <div className="results-row-header">
@@ -42,7 +51,7 @@ export function ResultsChart({ results }: ResultsChartProps) {
             >
               <div
                 className="results-bar-fill"
-                style={{ width: `${pct}%` }}
+                style={fillStyle}
                 data-testid={`bar-${option.id}`}
               />
             </div>
