@@ -138,8 +138,8 @@ a:hover {
   height: 2rem;
   border: 0;
   border-radius: 999px;
-  background: transparent;
-  color: var(--fg-muted);
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+  color: color-mix(in srgb, var(--fg) 68%, transparent);
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -159,9 +159,13 @@ a:hover {
 }
 
 .poll-sort-icon {
-  width: 1.05rem;
-  height: 1.05rem;
-  fill: currentColor;
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .poll-sort-menu {
@@ -210,8 +214,15 @@ a:hover {
 }
 
 .poll-sort-check {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
   color: var(--accent);
-  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
 .home-empty {

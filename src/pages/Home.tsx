@@ -167,10 +167,12 @@ export function Home() {
               aria-hidden="true"
               focusable="false"
             >
-              <path d="M6 3.5 3.5 6h5L6 3.5Z" />
-              <path d="M5.25 5.5h1.5v9h-1.5v-9Z" />
-              <path d="M14 16.5l2.5-2.5h-5l2.5 2.5Z" />
-              <path d="M13.25 5.5h1.5v9h-1.5v-9Z" />
+              <path d="M7 4v12" />
+              <path d="M7 4 4.5 6.5" />
+              <path d="M7 4l2.5 2.5" />
+              <path d="M13 16V4" />
+              <path d="m13 16-2.5-2.5" />
+              <path d="m13 16 2.5-2.5" />
             </svg>
           </button>
           {sortMenuOpen ? (
@@ -186,9 +188,14 @@ export function Home() {
                 >
                   <span>{option.label}</span>
                   {option.value === sortOption ? (
-                    <span className="poll-sort-check" aria-hidden="true">
-                      ✓
-                    </span>
+                    <svg
+                      className="poll-sort-check"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="m5 10 3 3 7-7" />
+                    </svg>
                   ) : null}
                 </button>
               ))}
