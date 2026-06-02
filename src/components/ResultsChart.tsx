@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PollResults } from "../types";
 
 interface ResultsChartProps {
@@ -46,6 +46,12 @@ export function ResultsChart({
   function stopTouchReveal() {
     clearRevealTimer();
   }
+
+  useEffect(() => {
+    return () => {
+      clearRevealTimer();
+    };
+  }, []);
 
   return (
     <div className="results-chart" role="list" aria-label="Poll results">

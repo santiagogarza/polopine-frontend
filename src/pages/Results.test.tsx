@@ -31,6 +31,15 @@ const switchedResults: PollResults = {
   ],
 };
 
+const resetResults: PollResults = {
+  question: "Favorite color?",
+  totalVotes: 0,
+  options: [
+    { id: "opt-red", text: "Red", votes: 0 },
+    { id: "opt-blue", text: "Blue", votes: 0 },
+  ],
+};
+
 const switchedPoll: Poll = {
   id: "poll-1",
   question: "Favorite color?",
@@ -94,6 +103,37 @@ describe("Results", () => {
       expect(mockGetPollResults).toHaveBeenCalledTimes(2);
     });
     expect(screen.getByLabelText("Blue is your vote")).toBeInTheDocument();
+  });
+
+  it("shows an error when switching votes fails", async () => {
+    localStorage.setItem("polopine:voted:poll-1", "opt-red");
+    mockGetPollResults.mockResolvedValue(sampleResults);
+    mockVoteApi.mockRejectedValue(new Error("Vote failed"));
+
+    renderResults();
+
+    expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Vote for Blue instead" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Vote failed");
+  });
+
+  it("clears a stale selected marker after votes are reset", async () => {
+    localStorage.setItem("polopine:voted:poll-1", "opt-red");
+    mockGetPollResults.mockResolvedValue(resetResults);
+
+    renderResults();
+
+    expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(localStorage.getItem("polopine:voted:poll-1")).toBe("1");
+    });
+    expect(screen.queryByLabelText("Red is your vote")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Vote for Red instead" }),
+    ).toBeInTheDocument();
   });
 
   it("shows error when results fetch fails", async () => {

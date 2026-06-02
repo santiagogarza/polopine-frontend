@@ -498,6 +498,11 @@ input[type="text"]:focus {
 
 .vote-switch-button:disabled {
   cursor: wait;
+}
+
+.results-row-switchable:hover .vote-switch-button:disabled,
+.results-row-switchable:focus-within .vote-switch-button:disabled,
+.results-row-revealed .vote-switch-button:disabled {
   opacity: 0.7;
 }
 

@@ -28,6 +28,13 @@ export function Results() {
     setSelectedOptionId(voted ? getVotedOptionId(id) : null);
   }, [id]);
 
+  useEffect(() => {
+    if (id && results?.totalVotes === 0 && selectedOptionId) {
+      markVoted(id);
+      setSelectedOptionId(null);
+    }
+  }, [id, results?.totalVotes, selectedOptionId]);
+
   async function refreshResults(pollId: string) {
     const data = await getPollResults(pollId);
     setResults(data);
@@ -155,6 +162,12 @@ export function Results() {
         switchingOptionId={switchingOptionId}
         onSwitchVote={(optionId) => void handleSwitchVote(optionId)}
       />
+
+      {error ? (
+        <p className="form-error results-error" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>
