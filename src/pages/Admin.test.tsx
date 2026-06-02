@@ -83,9 +83,9 @@ describe("Admin", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save key" }));
 
     expect(sessionStorage.getItem("polopine:admin-key")).toBe("secret-key");
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Admin key saved for this tab session.",
-    );
+    expect(
+      await screen.findByText("Admin key saved for this tab session."),
+    ).toBeInTheDocument();
   });
 
   it("reset my view clears local vote markers", async () => {
@@ -169,5 +169,27 @@ describe("Admin", () => {
     await waitFor(() => {
       expect(mockAdminDeletePoll).toHaveBeenCalledWith("poll-1", "secret-key");
     });
+  });
+
+  it("hides the admin key input when a key is already in sessionStorage", async () => {
+    sessionStorage.setItem("polopine:admin-key", "preloaded-key");
+
+    renderAdmin();
+
+    await screen.findByRole("heading", { name: "Admin" });
+    expect(screen.queryByLabelText("Admin key")).not.toBeInTheDocument();
+    expect(screen.getByText(/signed in for this tab/i)).toBeInTheDocument();
+  });
+
+  it("Log out button on Admin page clears sessionStorage and re-shows input", async () => {
+    sessionStorage.setItem("polopine:admin-key", "preloaded-key");
+
+    renderAdmin();
+
+    await screen.findByRole("heading", { name: "Admin" });
+    fireEvent.click(screen.getByRole("button", { name: "Log out" }));
+
+    expect(sessionStorage.getItem("polopine:admin-key")).toBeNull();
+    expect(screen.getByLabelText("Admin key")).toBeInTheDocument();
   });
 });

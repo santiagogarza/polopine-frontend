@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  ADMIN_KEY_CHANGED_EVENT,
+  clearAdminKey,
+  loadAdminKey,
+  saveAdminKey,
+} from "../adminKey";
+import {
   adminDeletePoll,
   adminResetAll,
   adminResetPollVotes,
@@ -13,20 +19,6 @@ import {
   listVotedPollIds,
 } from "../voted";
 
-const ADMIN_KEY_STORAGE = "polopine:admin-key";
-
-function loadAdminKey(): string {
-  return sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
-}
-
-function saveAdminKey(key: string): void {
-  if (key.trim()) {
-    sessionStorage.setItem(ADMIN_KEY_STORAGE, key.trim());
-  } else {
-    sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-  }
-}
-
 export function Admin() {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [votedIds, setVotedIds] = useState<string[]>(() => listVotedPollIds());
@@ -35,6 +27,20 @@ export function Admin() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    function syncFromStorage() {
+      const current = loadAdminKey();
+      setAdminKey(current);
+      setKeyInput(current);
+    }
+    window.addEventListener(ADMIN_KEY_CHANGED_EVENT, syncFromStorage);
+    window.addEventListener("storage", syncFromStorage);
+    return () => {
+      window.removeEventListener(ADMIN_KEY_CHANGED_EVENT, syncFromStorage);
+      window.removeEventListener("storage", syncFromStorage);
+    };
+  }, []);
 
   const refreshPolls = useCallback(async () => {
     try {
@@ -71,6 +77,14 @@ export function Admin() {
     saveAdminKey(keyInput);
     setAdminKey(keyInput.trim());
     setMessage("Admin key saved for this tab session.");
+    setError(null);
+  }
+
+  function handleClearKey() {
+    clearAdminKey();
+    setAdminKey("");
+    setKeyInput("");
+    setMessage("Admin key cleared for this tab session.");
     setError(null);
   }
 
@@ -188,26 +202,39 @@ export function Admin() {
         <p className="admin-hint">
           Requires <code>ADMIN_API_KEY</code> on the API (Render env in prod).
         </p>
-        <div className="admin-key-row">
-          <label className="admin-key-label" htmlFor="admin-key">
-            Admin key
-          </label>
-          <input
-            id="admin-key"
-            type="password"
-            className="admin-key-input"
-            value={keyInput}
-            onChange={(e) => setKeyInput(e.target.value)}
-            autoComplete="off"
-          />
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleSaveKey}
-          >
-            Save key
-          </button>
-        </div>
+        {adminKey ? (
+          <p className="admin-message" role="status">
+            Signed in for this tab.{" "}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={handleClearKey}
+            >
+              Log out
+            </button>
+          </p>
+        ) : (
+          <div className="admin-key-row">
+            <label className="admin-key-label" htmlFor="admin-key">
+              Admin key
+            </label>
+            <input
+              id="admin-key"
+              type="password"
+              className="admin-key-input"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleSaveKey}
+            >
+              Save key
+            </button>
+          </div>
+        )}
 
         {polls.length === 0 ? (
           <p className="admin-hint">No polls on server.</p>

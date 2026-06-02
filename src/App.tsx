@@ -6,6 +6,7 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import { AdminFooterAuth } from "./components/AdminFooterAuth";
 import { HomeResetGate } from "./components/HomeResetGate";
 import { ResetMyView } from "./components/ResetMyView";
 import { Admin } from "./pages/Admin";
@@ -49,6 +50,11 @@ export function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        <footer className="app-footer">
+          <div className="app-footer-inner">
+            <AdminFooterAuth />
+          </div>
+        </footer>
       </div>
     </BrowserRouter>
   );

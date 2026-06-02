@@ -695,6 +695,103 @@ input[type="text"]:focus {
   font-size: 0.8125rem;
 }
 
+.app-footer {
+  margin-top: auto;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.app-footer-inner {
+  max-width: 40rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-footer-link {
+  background: none;
+  border: 0;
+  padding: 0.25rem 0.4rem;
+  font: inherit;
+  font-size: 0.75rem;
+  color: var(--fg);
+  opacity: 0.25;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.admin-footer-link:hover,
+.admin-footer-link:focus-visible {
+  opacity: 0.85;
+  color: var(--accent);
+  outline: none;
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(38 37 30 / 35%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.admin-modal {
+  width: 100%;
+  max-width: 22rem;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.25rem 1rem;
+  box-shadow: 0 10px 30px rgb(38 37 30 / 18%);
+}
+
+.admin-modal-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.admin-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.admin-modal-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+}
+
+.admin-modal-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--fg);
+  font: inherit;
+}
+
+.admin-modal-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.admin-modal-error {
+  font-size: 0.8125rem;
+}
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 @media (max-width: 480px) {
   .app-header-inner {
     padding: 0.85rem 1rem;
