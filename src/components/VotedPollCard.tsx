@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { Poll } from "../types";
+import { OptionAuthor } from "./OptionAuthor";
 
 interface VotedPollCardProps {
   poll: Poll;
@@ -49,7 +50,8 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
                   <span className="voted-bar-rank" aria-hidden="true">
                     {rank}
                   </span>
-                  {option.text}
+                  <span className="voted-bar-text">{option.text}</span>
+                  <OptionAuthor authorVoterId={option.authorVoterId} />
                 </span>
                 <span className="voted-bar-meta">
                   {pct}% · {option.votes}

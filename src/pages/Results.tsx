@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPollResults } from "../api";
+import { AddOptionForm } from "../components/AddOptionForm";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
-import type { PollResults } from "../types";
+import type { Poll, PollOption, PollResults } from "../types";
 import { hasVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
+
+function toPollResults(poll: Poll): PollResults {
+  return {
+    question: poll.question,
+    allowVoterOptions: poll.allowVoterOptions,
+    totalVotes: poll.options.reduce((sum, option) => sum + option.votes, 0),
+    options: [...poll.options].sort((a, b) => b.votes - a.votes),
+  };
+}
 
 export function Results() {
   const { id } = useParams<{ id: string }>();
@@ -110,6 +120,28 @@ export function Results() {
     );
   }
 
+  function handleOptimisticOption(option: PollOption) {
+    setResults((current) =>
+      current
+        ? {
+            ...current,
+            options: [...current.options, option],
+          }
+        : current,
+    );
+  }
+
+  function handleRollbackOption(optionId: string) {
+    setResults((current) =>
+      current
+        ? {
+            ...current,
+            options: current.options.filter((option) => option.id !== optionId),
+          }
+        : current,
+    );
+  }
+
   return (
     <section className="page">
       <h1>{results.question}</h1>
@@ -121,6 +153,15 @@ export function Results() {
       <SharePollBar pollId={id} showVotedNotice />
 
       <ResultsChart results={results} />
+
+      <AddOptionForm
+        pollId={id}
+        options={results.options}
+        allowVoterOptions={results.allowVoterOptions}
+        onOptimisticOption={handleOptimisticOption}
+        onSavedPoll={(poll) => setResults(toPollResults(poll))}
+        onRollbackOption={handleRollbackOption}
+      />
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPoll, vote as voteApi } from "../api";
+import { AddOptionForm } from "../components/AddOptionForm";
+import { OptionAuthor } from "../components/OptionAuthor";
 import { SharePollBar } from "../components/SharePollBar";
-import type { Poll } from "../types";
+import type { Poll, PollOption } from "../types";
 import { hasVoted, markVoted } from "../voted";
 
 export function Vote() {
@@ -71,6 +73,28 @@ export function Vote() {
     }
   }
 
+  function handleOptimisticOption(option: PollOption) {
+    setPoll((current) =>
+      current
+        ? {
+            ...current,
+            options: [...current.options, option],
+          }
+        : current,
+    );
+  }
+
+  function handleRollbackOption(optionId: string) {
+    setPoll((current) =>
+      current
+        ? {
+            ...current,
+            options: current.options.filter((option) => option.id !== optionId),
+          }
+        : current,
+    );
+  }
+
   if (loading) {
     return (
       <section className="page">
@@ -121,9 +145,20 @@ export function Vote() {
             disabled={voting}
           >
             <span className="option-card-text">{option.text}</span>
+            <OptionAuthor authorVoterId={option.authorVoterId} />
           </button>
         ))}
       </div>
+
+      <AddOptionForm
+        pollId={id}
+        options={poll.options}
+        allowVoterOptions={poll.allowVoterOptions}
+        disabled={voting}
+        onOptimisticOption={handleOptimisticOption}
+        onSavedPoll={setPoll}
+        onRollbackOption={handleRollbackOption}
+      />
 
       {error ? (
         <p className="form-error" role="alert">

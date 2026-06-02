@@ -72,9 +72,10 @@ describe("CreatePoll", () => {
       id: "new-poll",
       question: "Lunch?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [
-        { id: "a", text: "Pizza", votes: 0 },
-        { id: "b", text: "Salad", votes: 0 },
+        { id: "a", text: "Pizza", votes: 0, authorVoterId: null },
+        { id: "b", text: "Salad", votes: 0, authorVoterId: null },
       ],
     });
 

@@ -1,4 +1,5 @@
 import type { PollResults } from "../types";
+import { OptionAuthor } from "./OptionAuthor";
 
 interface ResultsChartProps {
   results: PollResults;
@@ -26,7 +27,8 @@ export function ResultsChart({ results }: ResultsChartProps) {
                 <span className="results-rank" aria-hidden="true">
                   {rank}
                 </span>
-                {option.text}
+                <span className="results-label-text">{option.text}</span>
+                <OptionAuthor authorVoterId={option.authorVoterId} />
               </span>
               <span className="results-meta">
                 {option.votes} {option.votes === 1 ? "vote" : "votes"} · {pct}%

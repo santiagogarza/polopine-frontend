@@ -358,9 +358,70 @@ input[type="text"]:focus {
   cursor: wait;
 }
 
+.option-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  outline-offset: 2px;
+}
+
 .option-card-text {
+  display: block;
   font-weight: 600;
   font-size: 1.05rem;
+}
+
+.option-author {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.option-card:hover .option-author,
+.option-card:focus-visible .option-author,
+.results-row:hover .option-author,
+.voted-bar-row:hover .option-author {
+  opacity: 1;
+}
+
+.add-option-form {
+  margin-top: 0.9rem;
+  padding: 0.9rem;
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--card) 62%, transparent);
+}
+
+.add-option-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.add-option-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-option-row input {
+  flex: 1;
+}
+
+.add-option-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+
+.add-option-feedback {
+  color: #b42318;
+  font-weight: 600;
 }
 
 .page-footer-link {
@@ -387,6 +448,11 @@ input[type="text"]:focus {
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
+}
+
+.results-label-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .results-rank {
@@ -558,6 +624,11 @@ input[type="text"]:focus {
   min-width: 0;
 }
 
+.voted-bar-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .voted-bar-rank {
   display: inline-flex;
   align-items: center;
@@ -688,6 +759,41 @@ input[type="text"]:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.admin-option-setting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+
+.admin-option-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, #fff 54%, transparent);
+}
+
+.admin-option-label {
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
 }
 
 .btn-sm {

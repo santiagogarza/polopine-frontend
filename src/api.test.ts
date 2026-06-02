@@ -18,6 +18,7 @@ describe("api", () => {
     vi.stubGlobal("fetch", mockFetch);
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    vi.stubEnv("VITE_API_URL", "http://localhost:8080");
     localStorage.clear();
   });
 
@@ -38,6 +39,7 @@ describe("api", () => {
         id: "p1",
         question: "Q?",
         createdAt: "2026-01-01T00:00:00.000Z",
+        allowVoterOptions: true,
         options: [],
       },
     ];
@@ -55,9 +57,10 @@ describe("api", () => {
       id: "new",
       question: "Lunch?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [
-        { id: "a", text: "Pizza", votes: 0 },
-        { id: "b", text: "Salad", votes: 0 },
+        { id: "a", text: "Pizza", votes: 0, authorVoterId: null },
+        { id: "b", text: "Salad", votes: 0, authorVoterId: null },
       ],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -78,6 +81,7 @@ describe("api", () => {
       id: "poll/id",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -96,7 +100,8 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
-      options: [{ id: "opt-1", text: "A", votes: 1 }],
+      allowVoterOptions: true,
+      options: [{ id: "opt-1", text: "A", votes: 1, authorVoterId: null }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
@@ -121,7 +126,8 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
-      options: [{ id: "opt-1", text: "A", votes: 1 }],
+      allowVoterOptions: true,
+      options: [{ id: "opt-1", text: "A", votes: 1, authorVoterId: null }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
@@ -135,10 +141,46 @@ describe("api", () => {
     expect(headers["x-voter-id"]).toBe(minted);
   });
 
+  it("addOption POSTs text and x-voter-id header to options endpoint", async () => {
+    localStorage.setItem("polopine:voter-id", "voter-fixture-2");
+    const { addOption } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
+      options: [
+        { id: "opt-1", text: "A", votes: 0, authorVoterId: null },
+        {
+          id: "opt-2",
+          text: "B",
+          votes: 0,
+          authorVoterId: "voter-fixture-2",
+        },
+      ],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    await addOption("p1", "B");
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8080/polls/p1/options",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-voter-id": "voter-fixture-2",
+        },
+        body: JSON.stringify({ text: "B" }),
+      },
+    );
+  });
+
   it("getPollResults fetches results endpoint", async () => {
     const { getPollResults } = await loadApi();
     const results: PollResults = {
       question: "Q?",
+      allowVoterOptions: true,
       totalVotes: 0,
       options: [],
     };
@@ -170,7 +212,8 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
-      options: [{ id: "a", text: "A", votes: 0 }],
+      allowVoterOptions: true,
+      options: [{ id: "a", text: "A", votes: 0, authorVoterId: null }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
@@ -183,6 +226,51 @@ describe("api", () => {
         headers: { "x-admin-key": "secret-key" },
       },
     );
+  });
+
+  it("adminDeleteOption sends DELETE with x-admin-key", async () => {
+    const { adminDeleteOption } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
+      options: [{ id: "b", text: "B", votes: 0, authorVoterId: null }],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    await adminDeleteOption("p1", "a/b", "secret-key");
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8080/polls/p1/options/a%2Fb",
+      {
+        method: "DELETE",
+        headers: { "x-admin-key": "secret-key" },
+      },
+    );
+  });
+
+  it("adminSetAllowVoterOptions PATCHes allowVoterOptions with admin key", async () => {
+    const { adminSetAllowVoterOptions } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: false,
+      options: [{ id: "a", text: "A", votes: 0, authorVoterId: null }],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    await adminSetAllowVoterOptions("p1", false, "secret-key");
+
+    expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/polls/p1", {
+      method: "PATCH",
+      headers: {
+        "x-admin-key": "secret-key",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ allowVoterOptions: false }),
+    });
   });
 
   it("adminResetAll POSTs admin reset-all", async () => {

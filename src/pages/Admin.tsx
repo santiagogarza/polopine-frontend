@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  adminDeleteOption,
   adminDeletePoll,
   adminResetAll,
   adminResetPollVotes,
+  adminSetAllowVoterOptions,
   listPolls,
 } from "../api";
 import type { Poll } from "../types";
@@ -216,6 +218,60 @@ export function Admin() {
             {polls.map((poll) => (
               <li key={poll.id} className="admin-poll-row admin-poll-row-stack">
                 <span className="admin-poll-label">{poll.question}</span>
+                <div className="admin-option-setting">
+                  <span>
+                    Voter-added options are{" "}
+                    <strong>{poll.allowVoterOptions ? "enabled" : "disabled"}</strong>
+                    .
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    disabled={busy}
+                    onClick={() =>
+                      void runServerAction(
+                        `${
+                          poll.allowVoterOptions ? "Disabled" : "Enabled"
+                        } voter-added options on "${poll.question}".`,
+                        async () => {
+                          await adminSetAllowVoterOptions(
+                            poll.id,
+                            !poll.allowVoterOptions,
+                            adminKey,
+                          );
+                        },
+                      )
+                    }
+                  >
+                    {poll.allowVoterOptions ? "Disable add options" : "Enable add options"}
+                  </button>
+                </div>
+                <ul className="admin-option-list" aria-label={`${poll.question} options`}>
+                  {poll.options.map((option) => (
+                    <li key={option.id} className="admin-option-row">
+                      <span className="admin-option-label">
+                        {option.text} · {option.votes}{" "}
+                        {option.votes === 1 ? "vote" : "votes"}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy}
+                        aria-label={`Remove option ${option.text}`}
+                        onClick={() =>
+                          void runServerAction(
+                            `Removed option "${option.text}" from "${poll.question}".`,
+                            async () => {
+                              await adminDeleteOption(poll.id, option.id, adminKey);
+                            },
+                          )
+                        }
+                      >
+                        Remove option
+                      </button>
+                    </li>
+                  ))}
+                </ul>
                 <div className="admin-poll-actions">
                   <button
                     type="button"
