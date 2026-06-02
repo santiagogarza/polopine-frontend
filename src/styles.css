@@ -134,12 +134,12 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.15rem;
+  height: 2.15rem;
   border: 0;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--fg) 4%, transparent);
-  color: color-mix(in srgb, var(--fg) 68%, transparent);
+  background: var(--card);
+  color: var(--fg-muted);
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -159,8 +159,8 @@ a:hover {
 }
 
 .poll-sort-icon {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.25rem;
+  height: 1.25rem;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
