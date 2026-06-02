@@ -100,13 +100,20 @@ export function CreatePoll() {
                     ? "accent-swatch accent-swatch-selected"
                     : "accent-swatch"
                 }
-                style={{ "--swatch-color": color.hex } as CSSProperties}
+                style={
+                  {
+                    "--swatch-color": color.hex,
+                    "--swatch-contrast": color.contrast,
+                  } as CSSProperties
+                }
                 aria-label={color.label}
                 aria-pressed={color.key === accentColor}
                 title={color.label}
                 onClick={() => setAccentColor(color.key)}
               >
-                <span className="sr-only">{color.label}</span>
+                <span className="accent-swatch-check" aria-hidden="true">
+                  {color.key === accentColor ? "✓" : ""}
+                </span>
               </button>
             ))}
           </div>
