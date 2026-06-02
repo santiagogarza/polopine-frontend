@@ -26,9 +26,10 @@ const samplePolls: Poll[] = [
 describe("Home", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
-  it("renders the create CTA and poll cards from listPolls", async () => {
+  it("renders the create CTA, join QR, and poll cards from listPolls", async () => {
     mockListPolls.mockResolvedValue(samplePolls);
 
     render(
@@ -42,8 +43,33 @@ describe("Home", () => {
     ).toBeInTheDocument();
 
     expect(
+      screen.getByRole("heading", { name: "Join the demo" }),
+    ).toBeInTheDocument();
+
+    expect(
       await screen.findByText("How much of a Cursor ninja are you?"),
     ).toBeInTheDocument();
     expect(screen.getByText("2 options · 10 votes")).toBeInTheDocument();
+  });
+
+  it("renders a voted poll card with mini bars and vote total", async () => {
+    localStorage.setItem("polopine:voted:poll-1", "1");
+    mockListPolls.mockResolvedValue(samplePolls);
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByText("How much of a Cursor ninja are you?"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("You voted · 10 votes total")).toBeInTheDocument();
+    expect(screen.getByLabelText("Over a year: 70%")).toBeInTheDocument();
+    expect(screen.getByLabelText("Brand new: 30%")).toBeInTheDocument();
+
+    const topBar = screen.getByTestId("voted-bar-b");
+    expect(topBar).toHaveStyle({ width: "70%" });
   });
 });
