@@ -1,0 +1,47 @@
+---
+description: Polopine UI – conventions, run commands, and cloud-agent setup
+alwaysApply: true
+---
+
+# Polopine UI
+
+Vite + React + TypeScript polling app. Sibling repo `polopine-backend` is an Express API on Render.
+Both repos may be cloned together in the `polopine` multi-repo Cloud Agent environment.
+
+## Run commands
+
+```bash
+npm install         # idempotent
+npm test            # vitest + Testing Library + jsdom
+npm run typecheck   # tsc --noEmit
+npm run dev         # vite on port 3000
+npm run build       # tsc --noEmit && vite build
+```
+
+Green run before opening any PR: `npm install && npm run typecheck && npm test`.
+
+## Conventions
+
+- No shared imports with `polopine-backend`. Types are duplicated on purpose.
+- Read backend origin from `import.meta.env.VITE_API_URL` (default `http://localhost:8080`).
+- Public origin for the QR code comes from `VITE_PUBLIC_URL`, falling back to `window.location.origin`.
+- `localStorage` is the source of truth for "have I voted on this poll?" markers.
+- Plain CSS only — no UI frameworks. Match the existing visual language.
+- Cover new components / pages with vitest + Testing Library tests.
+
+## Cloud Agent specifics
+
+- Secrets you may need from Cursor Settings → Cloud Agents → Secrets:
+  - `VITE_API_URL` — backend base URL (no trailing slash)
+  - `VITE_PUBLIC_URL` — Vercel production URL, used by the join QR code
+- A `beforeShellExecution` hook blocks `rm -rf`, `git push --force[-with-lease]`, and `git reset --hard`.
+  If a command is denied, pick a safer alternative — do not try to bypass it.
+- When part of multi-repo, the backend repo is checked out as a sibling. Read it
+  to keep request/response shapes in sync, but only open PRs in the repo a change
+  actually belongs to.
+
+## Out of scope (don't touch unless asked)
+
+- UI framework / component library
+- Replacing React Router
+- Cross-repo imports from `polopine-backend`
