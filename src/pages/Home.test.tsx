@@ -39,11 +39,7 @@ describe("Home", () => {
     );
 
     expect(
-      screen.getByRole("button", { name: "Create a poll" }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("heading", { name: "Join the demo" }),
+      screen.getByRole("heading", { name: "Join the demo!" }),
     ).toBeInTheDocument();
 
     expect(
@@ -65,7 +61,7 @@ describe("Home", () => {
     expect(
       await screen.findByText("How much of a Cursor ninja are you?"),
     ).toBeInTheDocument();
-    expect(screen.getByText("You voted · 10 votes total")).toBeInTheDocument();
+    expect(screen.getByText("You voted")).toBeInTheDocument();
     expect(screen.getByLabelText("Over a year: 70%")).toBeInTheDocument();
     expect(screen.getByLabelText("Brand new: 30%")).toBeInTheDocument();
 

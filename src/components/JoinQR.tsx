@@ -6,15 +6,15 @@ export function JoinQR() {
   return (
     <aside className="join-qr">
       <div className="join-qr-text">
-        <h2>Join the demo</h2>
-        <p>Scan to open Polopine on your phone and vote with the room.</p>
+        <h2>Join the demo!</h2>
+        <p>Scan with your phone to vote with the room</p>
         <a href={PUBLIC_URL} className="join-qr-url">
           {PUBLIC_URL}
         </a>
       </div>
       <QRCodeSVG
         value={PUBLIC_URL}
-        size={148}
+        size={112}
         bgColor="#ffffff"
         fgColor="#26251e"
         includeMargin

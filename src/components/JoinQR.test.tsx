@@ -19,6 +19,6 @@ describe("JoinQR", () => {
     expect(
       screen.getByRole("link", { name: "https://polopine.vercel.app" }),
     ).toHaveAttribute("href", "https://polopine.vercel.app");
-    expect(screen.getByRole("heading", { name: "Join the demo" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Join the demo!" })).toBeInTheDocument();
   });
 });

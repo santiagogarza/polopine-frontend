@@ -54,20 +54,6 @@ export function Home() {
 
   return (
     <section className="page page-home">
-      <div className="home-hero">
-        <h1>Polls in seconds</h1>
-        <p className="page-lead">
-          Create a question, share the link, and watch votes roll in live.
-        </p>
-        <button
-          type="button"
-          className="btn btn-primary btn-hero"
-          onClick={() => navigate("/create")}
-        >
-          Create a poll
-        </button>
-      </div>
-
       <JoinQR />
 
       <h2 className="home-section-title">Recent polls</h2>

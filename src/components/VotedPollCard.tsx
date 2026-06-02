@@ -31,14 +31,12 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
       className="voted-card"
       onClick={() => navigate(`/poll/${poll.id}/results`)}
     >
-      <div className="voted-card-header">
+      <span className="voted-card-question">{poll.question}</span>
+      <p className="voted-card-status">
         <span className="voted-card-check" aria-hidden="true">
           ✓
         </span>
-        <span className="voted-card-question">{poll.question}</span>
-      </div>
-      <p className="voted-card-sub">
-        You voted · {total} {total === 1 ? "vote" : "votes"} total
+        <span className="voted-card-sub">You voted</span>
       </p>
       <div className="voted-card-bars" role="list" aria-label="Poll results">
         {visible.map((option, index) => {
