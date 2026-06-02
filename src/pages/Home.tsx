@@ -95,7 +95,7 @@ export function Home() {
       ) : null}
 
       {!loading && !error && sortedPolls.length > 0 ? (
-        <ul className="poll-list">
+        <ul className="poll-list" key={sort}>
           {sortedPolls.map((poll) => {
             const itemStyle: CSSProperties = {
               viewTransitionName: `poll-${poll.id}`,

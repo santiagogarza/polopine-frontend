@@ -228,6 +228,36 @@ a:hover {
   gap: 1rem;
 }
 
+.poll-list-item {
+  animation: poll-list-item-enter 0.28s ease both;
+}
+
+@keyframes poll-list-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::view-transition-group(*) {
+  animation-duration: 0.28s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poll-list-item {
+    animation: none;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 0.001s;
+  }
+}
+
 .btn-hero {
   width: 100%;
   margin-top: 0.5rem;
