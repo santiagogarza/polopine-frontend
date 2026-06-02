@@ -2,13 +2,40 @@ import { rotateVoterId } from "./voter";
 
 const PREFIX = "polopine:voted:";
 const KEY = (id: string) => `${PREFIX}${id}`;
+// Legacy marker value written by versions before POL-7 — present means "voted"
+// but the actual option id is unknown to this client.
+const LEGACY_VOTED = "1";
 
 export function hasVoted(id: string): boolean {
-  return localStorage.getItem(KEY(id)) === "1";
+  const value = localStorage.getItem(KEY(id));
+  return typeof value === "string" && value.length > 0;
 }
 
-export function markVoted(id: string): void {
-  localStorage.setItem(KEY(id), "1");
+/**
+ * Returns the option id this browser cast for the given poll, or `null` when
+ * the marker is missing or was written by a pre-POL-7 client (which stored
+ * only the boolean "1").
+ */
+export function getVotedOptionId(id: string): string | null {
+  const value = localStorage.getItem(KEY(id));
+  if (typeof value !== "string" || value.length === 0) {
+    return null;
+  }
+  if (value === LEGACY_VOTED) {
+    return null;
+  }
+  return value;
+}
+
+export function markVoted(id: string, optionId?: string): void {
+  // Persist the option id (POL-7) when known so the "already voted" view can
+  // highlight the user's pick and offer to switch. Fall back to the legacy
+  // marker for callers that don't have an option id (e.g. seed/test fixtures).
+  const value =
+    typeof optionId === "string" && optionId.length > 0
+      ? optionId
+      : LEGACY_VOTED;
+  localStorage.setItem(KEY(id), value);
 }
 
 export function clearVoted(id: string): void {

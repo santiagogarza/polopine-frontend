@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { ResultsChart } from "./ResultsChart";
 import type { PollResults } from "../types";
 
@@ -36,5 +36,57 @@ describe("ResultsChart", () => {
     expect(redBar).toHaveStyle({ width: "60%" });
     expect(blueBar).toHaveStyle({ width: "40%" });
     expect(greenBar).toHaveStyle({ width: "0%" });
+  });
+
+  it("does not render switch affordance without selectedOptionId + handler", () => {
+    render(<ResultsChart results={sampleResults} />);
+    expect(screen.queryByTestId("switch-vote-a")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("switch-vote-b")).not.toBeInTheDocument();
+  });
+
+  it("renders the voted marker on the selected option only", () => {
+    render(
+      <ResultsChart
+        results={sampleResults}
+        selectedOptionId="a"
+        onSwitchVote={() => {}}
+      />,
+    );
+
+    expect(screen.getByLabelText("Your vote")).toBeInTheDocument();
+    // Selected option has no switch affordance.
+    expect(screen.queryByTestId("switch-vote-a")).not.toBeInTheDocument();
+    // Non-selected options do.
+    expect(screen.getByTestId("switch-vote-b")).toBeInTheDocument();
+    expect(screen.getByTestId("switch-vote-c")).toBeInTheDocument();
+  });
+
+  it("calls onSwitchVote when a non-selected option's affordance is clicked", () => {
+    const onSwitchVote = vi.fn();
+    render(
+      <ResultsChart
+        results={sampleResults}
+        selectedOptionId="a"
+        onSwitchVote={onSwitchVote}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("switch-vote-b"));
+
+    expect(onSwitchVote).toHaveBeenCalledWith("b");
+  });
+
+  it("disables the switch affordance while a switch is in flight", () => {
+    render(
+      <ResultsChart
+        results={sampleResults}
+        selectedOptionId="a"
+        onSwitchVote={() => {}}
+        switching
+      />,
+    );
+
+    expect(screen.getByTestId("switch-vote-b")).toBeDisabled();
+    expect(screen.getByTestId("switch-vote-c")).toBeDisabled();
   });
 });

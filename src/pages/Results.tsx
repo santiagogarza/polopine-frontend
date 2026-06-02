@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getPollResults } from "../api";
+import { getPollResults, vote as voteApi } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
 import type { PollResults } from "../types";
-import { hasVoted } from "../voted";
+import { getVotedOptionId, hasVoted, markVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -14,6 +14,8 @@ export function Results() {
   const [results, setResults] = useState<PollResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [allowed, setAllowed] = useState(false);
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [switching, setSwitching] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -22,7 +24,14 @@ export function Results() {
       return;
     }
     setAllowed(hasVoted(id));
+    setSelectedOptionId(getVotedOptionId(id));
   }, [id]);
+
+  const fetchResults = useCallback(async (pollId: string) => {
+    const data = await getPollResults(pollId);
+    setResults(data);
+    setError(null);
+  }, []);
 
   useEffect(() => {
     if (!id || !allowed) {
@@ -32,7 +41,7 @@ export function Results() {
     const pollId = id;
     let cancelled = false;
 
-    async function fetchResults() {
+    async function safeFetch() {
       try {
         const data = await getPollResults(pollId);
         if (!cancelled) {
@@ -48,9 +57,9 @@ export function Results() {
       }
     }
 
-    void fetchResults();
+    void safeFetch();
     const intervalId = window.setInterval(() => {
-      void fetchResults();
+      void safeFetch();
     }, POLL_INTERVAL_MS);
 
     return () => {
@@ -58,6 +67,29 @@ export function Results() {
       window.clearInterval(intervalId);
     };
   }, [id, allowed]);
+
+  const handleSwitchVote = useCallback(
+    async (newOptionId: string) => {
+      if (!id || switching || newOptionId === selectedOptionId) {
+        return;
+      }
+      setSwitching(true);
+      setError(null);
+      try {
+        await voteApi(id, newOptionId);
+        markVoted(id, newOptionId);
+        setSelectedOptionId(newOptionId);
+        // Refresh immediately so the bars animate to their new values
+        // instead of waiting for the next 2s poll tick.
+        await fetchResults(id);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to switch vote");
+      } finally {
+        setSwitching(false);
+      }
+    },
+    [id, switching, selectedOptionId, fetchResults],
+  );
 
   if (!id) {
     return (
@@ -120,7 +152,18 @@ export function Results() {
 
       <SharePollBar pollId={id} showVotedNotice />
 
-      <ResultsChart results={results} />
+      <ResultsChart
+        results={results}
+        selectedOptionId={selectedOptionId}
+        onSwitchVote={handleSwitchVote}
+        switching={switching}
+      />
+
+      {error ? (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>
