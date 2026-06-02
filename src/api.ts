@@ -1,4 +1,5 @@
 import type { Poll, PollResults } from "./types";
+import { getOrCreateVoterId } from "./voter";
 
 const API_URL =
   import.meta.env.VITE_API_URL?.replace(/\/$/, "") ??
@@ -47,7 +48,10 @@ export async function vote(pollId: string, optionId: string): Promise<Poll> {
     `${API_URL}/polls/${encodeURIComponent(pollId)}/vote`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-voter-id": getOrCreateVoterId(),
+      },
       body: JSON.stringify({ optionId }),
     },
   );
@@ -63,6 +67,27 @@ export async function getPollResults(id: string): Promise<PollResults> {
 
 function adminHeaders(adminKey: string): HeadersInit {
   return { "x-admin-key": adminKey };
+}
+
+/**
+ * Checks whether the given admin key is currently valid. Returns true on
+ * success, false on 401, throws on rate-limit (429) or any other error.
+ * Intended for a "log in" UX that wants friendly feedback before persisting
+ * the key to storage.
+ */
+export async function verifyAdminKey(adminKey: string): Promise<boolean> {
+  const response = await fetch(`${API_URL}/admin/verify`, {
+    method: "POST",
+    headers: adminHeaders(adminKey),
+  });
+  if (response.status === 204) {
+    return true;
+  }
+  if (response.status === 401) {
+    return false;
+  }
+  await parseJson<never>(response);
+  return false;
 }
 
 export async function adminDeletePoll(

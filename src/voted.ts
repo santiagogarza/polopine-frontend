@@ -1,3 +1,5 @@
+import { rotateVoterId } from "./voter";
+
 const PREFIX = "polopine:voted:";
 const KEY = (id: string) => `${PREFIX}${id}`;
 
@@ -24,6 +26,9 @@ export function clearAllVoted(): void {
   for (const key of keys) {
     localStorage.removeItem(key);
   }
+  // Resetting the view also rotates the voter id so the server treats this
+  // browser as a fresh voter (matches the user's intent: "forget everything").
+  rotateVoterId();
 }
 
 /** Poll ids the user has marked as voted in this browser. */

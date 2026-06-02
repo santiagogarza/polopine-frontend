@@ -18,6 +18,7 @@ describe("api", () => {
     vi.stubGlobal("fetch", mockFetch);
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    localStorage.clear();
   });
 
   afterEach(() => {
@@ -88,7 +89,8 @@ describe("api", () => {
     );
   });
 
-  it("vote POSTs optionId to vote endpoint", async () => {
+  it("vote POSTs optionId and x-voter-id header to vote endpoint", async () => {
+    localStorage.setItem("polopine:voter-id", "voter-fixture-1");
     const { vote } = await loadApi();
     const poll: Poll = {
       id: "p1",
@@ -104,10 +106,33 @@ describe("api", () => {
       "http://localhost:8080/polls/p1/vote",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-voter-id": "voter-fixture-1",
+        },
         body: JSON.stringify({ optionId: "opt-1" }),
       },
     );
+  });
+
+  it("vote mints a voter id when none is in storage", async () => {
+    const { vote } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      options: [{ id: "opt-1", text: "A", votes: 1 }],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    expect(localStorage.getItem("polopine:voter-id")).toBeNull();
+    await vote("p1", "opt-1");
+
+    const minted = localStorage.getItem("polopine:voter-id");
+    expect(minted).toBeTruthy();
+    const call = mockFetch.mock.calls[0] as [string, RequestInit];
+    const headers = call[1].headers as Record<string, string>;
+    expect(headers["x-voter-id"]).toBe(minted);
   });
 
   it("getPollResults fetches results endpoint", async () => {
@@ -209,5 +234,45 @@ describe("api", () => {
     );
 
     await expect(adminDeletePoll("p1", "bad")).rejects.toThrow("Unauthorized");
+  });
+
+  it("verifyAdminKey POSTs admin key and returns true on 204", async () => {
+    const { verifyAdminKey } = await loadApi();
+    mockFetch.mockResolvedValue(jsonResponse(null, { ok: true, status: 204 }));
+
+    await expect(verifyAdminKey("good-key")).resolves.toBe(true);
+
+    expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/admin/verify", {
+      method: "POST",
+      headers: { "x-admin-key": "good-key" },
+    });
+  });
+
+  it("verifyAdminKey returns false on 401", async () => {
+    const { verifyAdminKey } = await loadApi();
+    mockFetch.mockResolvedValue(
+      jsonResponse({ error: "Unauthorized" }, {
+        ok: false,
+        status: 401,
+        statusText: "Unauthorized",
+      }),
+    );
+
+    await expect(verifyAdminKey("bad-key")).resolves.toBe(false);
+  });
+
+  it("verifyAdminKey throws on 429 rate-limit responses", async () => {
+    const { verifyAdminKey } = await loadApi();
+    mockFetch.mockResolvedValue(
+      jsonResponse({ error: "Too many requests" }, {
+        ok: false,
+        status: 429,
+        statusText: "Too Many Requests",
+      }),
+    );
+
+    await expect(verifyAdminKey("any-key")).rejects.toThrow(
+      "Too many requests",
+    );
   });
 });
