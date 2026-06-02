@@ -134,22 +134,25 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.15rem;
-  height: 2.15rem;
-  border: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--card-border);
   border-radius: 999px;
-  background: var(--card);
-  color: var(--fg-muted);
+  background: #fff;
+  color: var(--fg);
   cursor: pointer;
+  box-shadow: var(--shadow);
   transition:
     background 0.15s ease,
+    border-color 0.15s ease,
     color 0.15s ease;
 }
 
 .poll-sort-trigger:hover,
 .poll-sort-trigger:focus-visible,
 .poll-sort-trigger[aria-expanded="true"] {
-  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  background: var(--card);
+  border-color: var(--fg-muted);
   color: var(--fg);
 }
 
@@ -159,8 +162,8 @@ a:hover {
 }
 
 .poll-sort-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.4rem;
+  height: 1.4rem;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
