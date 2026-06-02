@@ -11,6 +11,19 @@ describe("JoinQR", () => {
     vi.unstubAllEnvs();
   });
 
+  it("returns null when PUBLIC_URL is empty", async () => {
+    vi.doMock("../config", () => ({
+      PUBLIC_URL: "",
+    }));
+    vi.resetModules();
+    const { JoinQR } = await import("./JoinQR");
+    const { container } = render(<JoinQR />);
+
+    expect(container.firstChild).toBeNull();
+    vi.doUnmock("../config");
+    vi.resetModules();
+  });
+
   it("renders an svg and shows the configured public URL", async () => {
     const { JoinQR } = await import("./JoinQR");
     const { container } = render(<JoinQR />);
