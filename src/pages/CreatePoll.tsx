@@ -1,11 +1,19 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, type CSSProperties, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ACCENT_COLORS,
+  DEFAULT_ACCENT_COLOR,
+  getAccentStyle,
+  type AccentColor,
+} from "../accentColors";
 import { createPoll } from "../api";
 
 export function CreatePoll() {
   const navigate = useNavigate();
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
+  const [accentColor, setAccentColor] =
+    useState<AccentColor>(DEFAULT_ACCENT_COLOR);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -48,7 +56,7 @@ export function CreatePoll() {
 
     setSubmitting(true);
     try {
-      const poll = await createPoll(trimmedQuestion, trimmedOptions);
+      const poll = await createPoll(trimmedQuestion, trimmedOptions, accentColor);
       navigate(`/poll/${poll.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create poll");
@@ -58,7 +66,10 @@ export function CreatePoll() {
   }
 
   return (
-    <section className="page">
+    <section
+      className="page poll-accent-scope"
+      style={getAccentStyle(accentColor)}
+    >
       <h1>Create a poll</h1>
       <p className="page-lead">
         Ask a question and add at least two options. Share the vote link when
@@ -76,6 +87,37 @@ export function CreatePoll() {
             autoFocus
           />
         </label>
+
+        <fieldset className="accent-fieldset">
+          <legend className="field-label">Accent color</legend>
+          <div className="accent-swatches" aria-label="Accent color options">
+            {ACCENT_COLORS.map((color) => (
+              <button
+                key={color.key}
+                type="button"
+                className={
+                  color.key === accentColor
+                    ? "accent-swatch accent-swatch-selected"
+                    : "accent-swatch"
+                }
+                style={
+                  {
+                    "--swatch-color": color.hex,
+                    "--swatch-contrast": color.contrast,
+                  } as CSSProperties
+                }
+                aria-label={color.label}
+                aria-pressed={color.key === accentColor}
+                title={color.label}
+                onClick={() => setAccentColor(color.key)}
+              >
+                <span className="accent-swatch-check" aria-hidden="true">
+                  {color.key === accentColor ? "✓" : ""}
+                </span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         <fieldset className="options-fieldset">
           <legend className="field-label">Options</legend>

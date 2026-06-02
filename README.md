@@ -43,7 +43,7 @@ Restart the dev server after changing `.env`.
 | Path | Page |
 |------|------|
 | `/` | Home — create CTA, join QR, recent polls (voted polls show live mini-results) |
-| `/create` | Create poll |
+| `/create` | Create poll with an 8-color accent picker |
 | `/poll/:id` | Vote (redirects to results if already voted) |
 | `/poll/:id/results` | Live results (vote required; polls every 2s) |
 

@@ -18,6 +18,7 @@ describe("api", () => {
     vi.stubGlobal("fetch", mockFetch);
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    vi.stubEnv("VITE_API_URL", "http://localhost:8080");
     localStorage.clear();
   });
 
@@ -37,6 +38,7 @@ describe("api", () => {
       {
         id: "p1",
         question: "Q?",
+        accentColor: "orange",
         createdAt: "2026-01-01T00:00:00.000Z",
         options: [],
       },
@@ -54,6 +56,7 @@ describe("api", () => {
     const poll: Poll = {
       id: "new",
       question: "Lunch?",
+      accentColor: "teal",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "a", text: "Pizza", votes: 0 },
@@ -62,12 +65,16 @@ describe("api", () => {
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
-    const result = await createPoll("Lunch?", ["Pizza", "Salad"]);
+    const result = await createPoll("Lunch?", ["Pizza", "Salad"], "teal");
 
     expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/polls", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: "Lunch?", options: ["Pizza", "Salad"] }),
+      body: JSON.stringify({
+        question: "Lunch?",
+        options: ["Pizza", "Salad"],
+        accentColor: "teal",
+      }),
     });
     expect(result).toEqual(poll);
   });
@@ -77,6 +84,7 @@ describe("api", () => {
     const poll: Poll = {
       id: "poll/id",
       question: "Q?",
+      accentColor: "orange",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [],
     };
@@ -95,6 +103,7 @@ describe("api", () => {
     const poll: Poll = {
       id: "p1",
       question: "Q?",
+      accentColor: "orange",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [{ id: "opt-1", text: "A", votes: 1 }],
     };
@@ -120,6 +129,7 @@ describe("api", () => {
     const poll: Poll = {
       id: "p1",
       question: "Q?",
+      accentColor: "orange",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [{ id: "opt-1", text: "A", votes: 1 }],
     };
@@ -139,6 +149,7 @@ describe("api", () => {
     const { getPollResults } = await loadApi();
     const results: PollResults = {
       question: "Q?",
+      accentColor: "orange",
       totalVotes: 0,
       options: [],
     };
@@ -169,6 +180,7 @@ describe("api", () => {
     const poll: Poll = {
       id: "p1",
       question: "Q?",
+      accentColor: "orange",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [{ id: "a", text: "A", votes: 0 }],
     };

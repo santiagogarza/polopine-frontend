@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { getAccentStyle } from "../accentColors";
 import { getPollResults } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
@@ -111,7 +112,10 @@ export function Results() {
   }
 
   return (
-    <section className="page">
+    <section
+      className="page poll-accent-scope"
+      style={getAccentStyle(results.accentColor)}
+    >
       <h1>{results.question}</h1>
       <p className="page-lead">
         Live results · {results.totalVotes}{" "}

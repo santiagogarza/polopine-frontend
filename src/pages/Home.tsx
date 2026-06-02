@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAccentStyle } from "../accentColors";
 import { listPolls } from "../api";
 import { JoinQR } from "../components/JoinQR";
 import { VotedPollCard } from "../components/VotedPollCard";
@@ -87,7 +88,8 @@ export function Home() {
               <li key={poll.id}>
                 <button
                   type="button"
-                  className="poll-card"
+                  className="poll-card poll-accent-scope"
+                  style={getAccentStyle(poll.accentColor)}
                   onClick={() => navigate(`/poll/${poll.id}`)}
                 >
                   <span className="poll-card-question">{poll.question}</span>

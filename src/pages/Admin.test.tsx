@@ -26,6 +26,7 @@ const samplePolls: Poll[] = [
   {
     id: "poll-1",
     question: "Demo poll?",
+    accentColor: "orange",
     createdAt: "2026-01-01T00:00:00.000Z",
     options: [
       { id: "a", text: "A", votes: 1 },

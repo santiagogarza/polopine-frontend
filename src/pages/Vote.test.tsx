@@ -36,6 +36,7 @@ const mockMarkVoted = vi.mocked(markVoted);
 const samplePoll: Poll = {
   id: "poll-1",
   question: "Favorite color?",
+  accentColor: "indigo",
   createdAt: "2026-01-01T00:00:00.000Z",
   options: [
     { id: "opt-red", text: "Red", votes: 0 },
@@ -93,6 +94,10 @@ describe("Vote", () => {
     renderVote();
 
     expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Favorite color?" }).closest("section")).toHaveStyle({
+      "--accent": "#2563eb",
+      "--accent-contrast": "#ffffff",
+    });
 
     fireEvent.click(screen.getByRole("button", { name: "Red" }));
 

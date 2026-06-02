@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { getAccentStyle } from "../accentColors";
 import { getPoll, vote as voteApi } from "../api";
 import { SharePollBar } from "../components/SharePollBar";
 import type { Poll } from "../types";
@@ -105,7 +106,10 @@ export function Vote() {
   }
 
   return (
-    <section className="page">
+    <section
+      className="page poll-accent-scope"
+      style={getAccentStyle(poll.accentColor)}
+    >
       <h1>{poll.question}</h1>
       <p className="page-lead">Choose one option to cast your vote.</p>
 

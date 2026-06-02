@@ -71,6 +71,7 @@ describe("CreatePoll", () => {
     mockCreatePoll.mockResolvedValue({
       id: "new-poll",
       question: "Lunch?",
+      accentColor: "teal",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "a", text: "Pizza", votes: 0 },
@@ -89,12 +90,35 @@ describe("CreatePoll", () => {
     fireEvent.change(screen.getByLabelText("Option 2"), {
       target: { value: "Salad" },
     });
+    fireEvent.click(screen.getByRole("button", { name: "Teal" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Create poll" }));
 
     await waitFor(() => {
-      expect(mockCreatePoll).toHaveBeenCalledWith("Lunch?", ["Pizza", "Salad"]);
+      expect(mockCreatePoll).toHaveBeenCalledWith("Lunch?", ["Pizza", "Salad"], "teal");
       expect(navigate).toHaveBeenCalledWith("/poll/new-poll");
+    });
+  });
+
+  it("shows 8 swatches with orange selected by default", () => {
+    renderCreate();
+
+    const swatches = screen.getAllByRole("button", { pressed: false });
+    expect(screen.getByRole("button", { name: "Orange" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(swatches).toHaveLength(7);
+  });
+
+  it("previews the selected accent on the create page CTA", () => {
+    renderCreate();
+
+    fireEvent.click(screen.getByRole("button", { name: "Amber" }));
+
+    expect(screen.getByRole("heading", { name: "Create a poll" }).closest("section")).toHaveStyle({
+      "--accent": "#b86b00",
+      "--accent-contrast": "#14120b",
     });
   });
 

@@ -17,6 +17,7 @@ describe("VotedPollCard", () => {
     const poll: Poll = {
       id: "poll-1",
       question: "Ranked?",
+      accentColor: "green",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "o1", text: "One", votes: 1 },
@@ -33,6 +34,10 @@ describe("VotedPollCard", () => {
     expect(screen.getByLabelText("Two: 33%")).toBeInTheDocument();
     expect(screen.getByLabelText("Five: 27%")).toBeInTheDocument();
     expect(screen.getByText("+2 more")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Ranked/ })).toHaveStyle({
+      "--accent": "#2f8f46",
+      "--accent-contrast": "#14120b",
+    });
     expect(screen.queryByText("Six")).not.toBeInTheDocument();
   });
 
@@ -40,6 +45,7 @@ describe("VotedPollCard", () => {
     const poll: Poll = {
       id: "poll-zero",
       question: "No votes?",
+      accentColor: "orange",
       createdAt: "2026-01-01T00:00:00.000Z",
       options: [
         { id: "a", text: "A", votes: 0 },

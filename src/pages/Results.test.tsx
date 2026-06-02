@@ -13,6 +13,7 @@ const mockGetPollResults = vi.mocked(getPollResults);
 
 const sampleResults: PollResults = {
   question: "Favorite color?",
+  accentColor: "violet",
   totalVotes: 2,
   options: [
     { id: "opt-red", text: "Red", votes: 2 },
@@ -53,6 +54,10 @@ describe("Results", () => {
 
     expect(await screen.findByText("Favorite color?")).toBeInTheDocument();
     expect(screen.getByText(/2 votes total/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Favorite color?" }).closest("section")).toHaveStyle({
+      "--accent": "#7c3aed",
+      "--accent-contrast": "#ffffff",
+    });
     expect(mockGetPollResults).toHaveBeenCalledWith("poll-1");
   });
 
