@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getPollResults } from "../api";
+import { getPollResults, vote as voteApi } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
 import type { PollResults } from "../types";
-import { hasVoted } from "../voted";
+import { getVotedOption, hasVoted, markVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -14,6 +14,10 @@ export function Results() {
   const [results, setResults] = useState<PollResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [allowed, setAllowed] = useState(false);
+  const [votedOptionId, setVotedOptionId] = useState<string | null>(null);
+  const [switchingOptionId, setSwitchingOptionId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!id) {
@@ -22,6 +26,7 @@ export function Results() {
       return;
     }
     setAllowed(hasVoted(id));
+    setVotedOptionId(getVotedOption(id));
   }, [id]);
 
   useEffect(() => {
@@ -110,6 +115,26 @@ export function Results() {
     );
   }
 
+  async function handleSwitchVote(optionId: string) {
+    if (!id || switchingOptionId) {
+      return;
+    }
+
+    setSwitchingOptionId(optionId);
+    setError(null);
+    try {
+      await voteApi(id, optionId);
+      markVoted(id, optionId);
+      setVotedOptionId(optionId);
+      const data = await getPollResults(id);
+      setResults(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not change vote");
+    } finally {
+      setSwitchingOptionId(null);
+    }
+  }
+
   return (
     <section className="page">
       <h1>{results.question}</h1>
@@ -120,7 +145,18 @@ export function Results() {
 
       <SharePollBar pollId={id} showVotedNotice />
 
-      <ResultsChart results={results} />
+      <ResultsChart
+        results={results}
+        selectedOptionId={votedOptionId}
+        onSwitchVote={handleSwitchVote}
+        switchingOptionId={switchingOptionId}
+      />
+
+      {error ? (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>

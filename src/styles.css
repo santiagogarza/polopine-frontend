@@ -419,12 +419,76 @@ input[type="text"]:focus {
   overflow: hidden;
 }
 
+.results-row-body {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.results-row-body .results-bar-track {
+  flex: 1;
+  min-width: 0;
+}
+
+.results-your-vote {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.results-switch-btn {
+  flex-shrink: 0;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+.results-row--switchable:hover .results-switch-btn,
+.results-row--switchable.results-row--reveal-switch .results-switch-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.results-switch-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.results-switch-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+@media (hover: none) {
+  .results-row--switchable:not(.results-row--reveal-switch) .results-switch-btn {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 .results-bar-fill {
   height: 100%;
   background: var(--accent);
   border-radius: 999px;
   min-width: 0;
   transition: width 0.4s ease;
+}
+
+.results-row--yours .results-bar-fill {
+  background: color-mix(in srgb, var(--accent) 85%, var(--fg));
 }
 
 .join-qr {
