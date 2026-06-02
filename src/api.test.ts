@@ -38,6 +38,7 @@ describe("api", () => {
         id: "p1",
         question: "Q?",
         createdAt: "2026-01-01T00:00:00.000Z",
+        allowVoterOptions: true,
         options: [],
       },
     ];
@@ -55,9 +56,10 @@ describe("api", () => {
       id: "new",
       question: "Lunch?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [
-        { id: "a", text: "Pizza", votes: 0 },
-        { id: "b", text: "Salad", votes: 0 },
+        { id: "a", text: "Pizza", votes: 0, authorVoterId: null },
+        { id: "b", text: "Salad", votes: 0, authorVoterId: null },
       ],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -78,6 +80,7 @@ describe("api", () => {
       id: "poll/id",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
       options: [],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -96,7 +99,8 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
-      options: [{ id: "opt-1", text: "A", votes: 1 }],
+      allowVoterOptions: true,
+      options: [{ id: "opt-1", text: "A", votes: 1, authorVoterId: null }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
@@ -121,7 +125,8 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
-      options: [{ id: "opt-1", text: "A", votes: 1 }],
+      allowVoterOptions: true,
+      options: [{ id: "opt-1", text: "A", votes: 1, authorVoterId: null }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
@@ -170,7 +175,8 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
-      options: [{ id: "a", text: "A", votes: 0 }],
+      allowVoterOptions: true,
+      options: [{ id: "a", text: "A", votes: 0, authorVoterId: null }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
 
@@ -259,6 +265,102 @@ describe("api", () => {
     );
 
     await expect(verifyAdminKey("bad-key")).resolves.toBe(false);
+  });
+
+  it("addOption POSTs text and x-voter-id to /polls/:id/options", async () => {
+    localStorage.setItem("polopine:voter-id", "voter-fixture-2");
+    const { addOption } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
+      options: [
+        { id: "opt-1", text: "A", votes: 0, authorVoterId: null },
+        {
+          id: "opt-2",
+          text: "Sushi",
+          votes: 0,
+          authorVoterId: "voter-fixture-2",
+        },
+      ],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll, { ok: true, status: 201 }));
+
+    const result = await addOption("p1", "Sushi");
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8080/polls/p1/options",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-voter-id": "voter-fixture-2",
+        },
+        body: JSON.stringify({ text: "Sushi" }),
+      },
+    );
+    expect(result).toEqual(poll);
+  });
+
+  it("addOption throws server message on duplicate", async () => {
+    const { addOption } = await loadApi();
+    mockFetch.mockResolvedValue(
+      jsonResponse(
+        { error: "An option with this text already exists" },
+        { ok: false, status: 409, statusText: "Conflict" },
+      ),
+    );
+
+    await expect(addOption("p1", "Pizza")).rejects.toThrow(
+      "An option with this text already exists",
+    );
+  });
+
+  it("adminDeleteOption sends DELETE with x-admin-key", async () => {
+    const { adminDeleteOption } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: true,
+      options: [{ id: "opt-1", text: "A", votes: 0, authorVoterId: null }],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    await adminDeleteOption("p1", "opt-bad", "secret-key");
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      "http://localhost:8080/polls/p1/options/opt-bad",
+      {
+        method: "DELETE",
+        headers: { "x-admin-key": "secret-key" },
+      },
+    );
+  });
+
+  it("adminSetAllowVoterOptions PATCHes the toggle with admin key", async () => {
+    const { adminSetAllowVoterOptions } = await loadApi();
+    const poll: Poll = {
+      id: "p1",
+      question: "Q?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      allowVoterOptions: false,
+      options: [],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    const result = await adminSetAllowVoterOptions("p1", false, "secret-key");
+
+    expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/polls/p1", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": "secret-key",
+      },
+      body: JSON.stringify({ allowVoterOptions: false }),
+    });
+    expect(result).toEqual(poll);
   });
 
   it("verifyAdminKey throws on 429 rate-limit responses", async () => {

@@ -15,8 +15,8 @@ const sampleResults: PollResults = {
   question: "Favorite color?",
   totalVotes: 2,
   options: [
-    { id: "opt-red", text: "Red", votes: 2 },
-    { id: "opt-blue", text: "Blue", votes: 0 },
+    { id: "opt-red", text: "Red", votes: 2, authorVoterId: null },
+    { id: "opt-blue", text: "Blue", votes: 0, authorVoterId: null },
   ],
 };
 

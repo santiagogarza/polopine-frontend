@@ -2,9 +2,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  adminDeleteOption,
   adminDeletePoll,
   adminResetAll,
   adminResetPollVotes,
+  adminSetAllowVoterOptions,
   listPolls,
 } from "../api";
 import type { Poll } from "../types";
@@ -15,21 +17,26 @@ vi.mock("../api", () => ({
   adminDeletePoll: vi.fn(),
   adminResetPollVotes: vi.fn(),
   adminResetAll: vi.fn(),
+  adminDeleteOption: vi.fn(),
+  adminSetAllowVoterOptions: vi.fn(),
 }));
 
 const mockListPolls = vi.mocked(listPolls);
 const mockAdminDeletePoll = vi.mocked(adminDeletePoll);
 const mockAdminResetPollVotes = vi.mocked(adminResetPollVotes);
 const mockAdminResetAll = vi.mocked(adminResetAll);
+const mockAdminDeleteOption = vi.mocked(adminDeleteOption);
+const mockAdminSetAllowVoterOptions = vi.mocked(adminSetAllowVoterOptions);
 
 const samplePolls: Poll[] = [
   {
     id: "poll-1",
     question: "Demo poll?",
     createdAt: "2026-01-01T00:00:00.000Z",
+    allowVoterOptions: true,
     options: [
-      { id: "a", text: "A", votes: 1 },
-      { id: "b", text: "B", votes: 0 },
+      { id: "a", text: "A", votes: 1, authorVoterId: null },
+      { id: "b", text: "B", votes: 0, authorVoterId: null },
     ],
   },
 ];
@@ -119,8 +126,8 @@ describe("Admin", () => {
     mockAdminResetPollVotes.mockResolvedValue({
       ...samplePolls[0],
       options: [
-        { id: "a", text: "A", votes: 0 },
-        { id: "b", text: "B", votes: 0 },
+        { id: "a", text: "A", votes: 0, authorVoterId: null },
+        { id: "b", text: "B", votes: 0, authorVoterId: null },
       ],
     });
 
@@ -154,6 +161,68 @@ describe("Admin", () => {
         "Server reset to seed state",
       );
     });
+  });
+
+  it("remove option calls adminDeleteOption with saved key", async () => {
+    sessionStorage.setItem("polopine:admin-key", "secret-key");
+    mockAdminDeleteOption.mockResolvedValue({
+      ...samplePolls[0],
+      options: [{ id: "b", text: "B", votes: 0, authorVoterId: null }],
+    });
+
+    renderAdmin();
+
+    await screen.findByText("Demo poll?");
+
+    const removeButtons = screen.getAllByRole("button", { name: "Remove" });
+    fireEvent.click(removeButtons[0]);
+
+    await waitFor(() => {
+      expect(mockAdminDeleteOption).toHaveBeenCalledWith(
+        "poll-1",
+        "a",
+        "secret-key",
+      );
+    });
+  });
+
+  it("toggle button disables voter-added options via adminSetAllowVoterOptions", async () => {
+    sessionStorage.setItem("polopine:admin-key", "secret-key");
+    mockAdminSetAllowVoterOptions.mockResolvedValue({
+      ...samplePolls[0],
+      allowVoterOptions: false,
+    });
+
+    renderAdmin();
+
+    await screen.findByText("Demo poll?");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Disable voter options" }),
+    );
+
+    await waitFor(() => {
+      expect(mockAdminSetAllowVoterOptions).toHaveBeenCalledWith(
+        "poll-1",
+        false,
+        "secret-key",
+      );
+    });
+  });
+
+  it("toggle button shows 'Enable voter options' when currently disabled", async () => {
+    sessionStorage.setItem("polopine:admin-key", "secret-key");
+    mockListPolls.mockResolvedValue([
+      { ...samplePolls[0], allowVoterOptions: false },
+    ]);
+
+    renderAdmin();
+
+    await screen.findByText("Demo poll?");
+
+    expect(
+      screen.getByRole("button", { name: "Enable voter options" }),
+    ).toBeInTheDocument();
   });
 
   it("delete poll calls adminDeletePoll with saved key", async () => {
