@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { PollResults } from "../types";
 
 interface ResultsChartProps {
@@ -9,6 +10,13 @@ function percent(votes: number, total: number): number {
     return 0;
   }
   return Math.round((votes / total) * 100);
+}
+
+function barStyle(pct: number, index: number): CSSProperties {
+  return {
+    "--bar-delay": `${index * 40}ms`,
+    width: `${pct}%`,
+  } as CSSProperties;
 }
 
 export function ResultsChart({ results }: ResultsChartProps) {
@@ -42,7 +50,7 @@ export function ResultsChart({ results }: ResultsChartProps) {
             >
               <div
                 className="results-bar-fill"
-                style={{ width: `${pct}%` }}
+                style={barStyle(pct, index)}
                 data-testid={`bar-${option.id}`}
               />
             </div>

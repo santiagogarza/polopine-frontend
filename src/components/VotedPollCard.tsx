@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Poll } from "../types";
 
@@ -16,6 +17,13 @@ function percent(votes: number, total: number): number {
     return 0;
   }
   return Math.round((votes / total) * 100);
+}
+
+function barStyle(pct: number, index: number): CSSProperties {
+  return {
+    "--bar-delay": `${index * 40}ms`,
+    width: `${pct}%`,
+  } as CSSProperties;
 }
 
 export function VotedPollCard({ poll }: VotedPollCardProps) {
@@ -65,7 +73,7 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
               >
                 <div
                   className="results-bar-fill"
-                  style={{ width: `${pct}%` }}
+                  style={barStyle(pct, index)}
                   data-testid={`voted-bar-${option.id}`}
                 />
               </div>

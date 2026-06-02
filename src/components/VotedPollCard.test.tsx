@@ -34,6 +34,12 @@ describe("VotedPollCard", () => {
     expect(screen.getByLabelText("Five: 27%")).toBeInTheDocument();
     expect(screen.getByText("+2 more")).toBeInTheDocument();
     expect(screen.queryByText("Six")).not.toBeInTheDocument();
+    expect(screen.getByTestId("voted-bar-o2").style.getPropertyValue("--bar-delay")).toBe(
+      "0ms",
+    );
+    expect(screen.getByTestId("voted-bar-o5").style.getPropertyValue("--bar-delay")).toBe(
+      "40ms",
+    );
   });
 
   it("renders 0% bars without divide-by-zero when total votes is 0", () => {
