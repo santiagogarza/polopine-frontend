@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ResultsChart } from "./ResultsChart";
 import type { PollResults } from "../types";
 
@@ -14,8 +14,20 @@ const sampleResults: PollResults = {
 };
 
 describe("ResultsChart", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("renders option labels, vote counts, percentages, and bar widths", () => {
     render(<ResultsChart results={sampleResults} />);
+
+    act(() => {
+      vi.runAllTimers();
+    });
 
     expect(screen.getByText("1", { selector: ".results-rank" })).toBeInTheDocument();
     expect(screen.getByText("2", { selector: ".results-rank" })).toBeInTheDocument();

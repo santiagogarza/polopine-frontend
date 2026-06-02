@@ -424,7 +424,21 @@ input[type="text"]:focus {
   background: var(--accent);
   border-radius: 999px;
   min-width: 0;
-  transition: width 0.4s ease;
+}
+
+.results-bar-fill--motion {
+  transition-property: width;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.results-bar-fill--reduced {
+  transition: opacity 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .results-bar-fill--motion {
+    transition: none;
+  }
 }
 
 .join-qr {

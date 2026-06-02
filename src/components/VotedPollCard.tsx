@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { Poll } from "../types";
+import { AnimatedBarFill } from "./AnimatedBarFill";
 
 interface VotedPollCardProps {
   poll: Poll;
@@ -63,10 +64,10 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
                 aria-valuemax={100}
                 aria-label={`${option.text}: ${pct}%`}
               >
-                <div
-                  className="results-bar-fill"
-                  style={{ width: `${pct}%` }}
-                  data-testid={`voted-bar-${option.id}`}
+                <AnimatedBarFill
+                  percent={pct}
+                  index={index}
+                  testId={`voted-bar-${option.id}`}
                 />
               </div>
             </div>

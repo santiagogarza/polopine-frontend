@@ -1,4 +1,5 @@
 import type { PollResults } from "../types";
+import { AnimatedBarFill } from "./AnimatedBarFill";
 
 interface ResultsChartProps {
   results: PollResults;
@@ -40,10 +41,10 @@ export function ResultsChart({ results }: ResultsChartProps) {
               aria-valuemax={100}
               aria-label={`${option.text}: ${pct}%`}
             >
-              <div
-                className="results-bar-fill"
-                style={{ width: `${pct}%` }}
-                data-testid={`bar-${option.id}`}
+              <AnimatedBarFill
+                percent={pct}
+                index={index}
+                testId={`bar-${option.id}`}
               />
             </div>
           </div>
