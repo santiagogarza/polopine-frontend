@@ -18,6 +18,7 @@ describe("api", () => {
     vi.stubGlobal("fetch", mockFetch);
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    vi.stubEnv("VITE_API_URL", "http://localhost:8080");
     localStorage.clear();
   });
 
