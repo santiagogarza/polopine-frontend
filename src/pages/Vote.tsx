@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPoll, vote as voteApi } from "../api";
 import { SharePollBar } from "../components/SharePollBar";
-import type { Poll } from "../types";
+import { pollAccentHex, type Poll } from "../types";
 import { hasVoted, markVoted } from "../voted";
 
 export function Vote() {
@@ -105,7 +105,10 @@ export function Vote() {
   }
 
   return (
-    <section className="page">
+    <section
+      className="page"
+      style={{ ["--accent" as string]: pollAccentHex(poll.accentColor) }}
+    >
       <h1>{poll.question}</h1>
       <p className="page-lead">Choose one option to cast your vote.</p>
 

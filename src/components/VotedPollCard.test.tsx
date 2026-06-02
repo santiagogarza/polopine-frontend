@@ -18,6 +18,7 @@ describe("VotedPollCard", () => {
       id: "poll-1",
       question: "Ranked?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "orange",
       options: [
         { id: "o1", text: "One", votes: 1 },
         { id: "o2", text: "Two", votes: 5 },
@@ -36,11 +37,26 @@ describe("VotedPollCard", () => {
     expect(screen.queryByText("Six")).not.toBeInTheDocument();
   });
 
+  it("sets the poll accent color on the card container", () => {
+    const poll: Poll = {
+      id: "poll-violet",
+      question: "Accented?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "violet",
+      options: [{ id: "a", text: "A", votes: 1 }],
+    };
+
+    const { container } = renderCard(poll);
+    const card = container.querySelector(".voted-card") as HTMLElement;
+    expect(card.style.getPropertyValue("--accent")).toBe("#7c3aed");
+  });
+
   it("renders 0% bars without divide-by-zero when total votes is 0", () => {
     const poll: Poll = {
       id: "poll-zero",
       question: "No votes?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "violet",
       options: [
         { id: "a", text: "A", votes: 0 },
         { id: "b", text: "B", votes: 0 },

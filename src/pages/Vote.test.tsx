@@ -37,6 +37,7 @@ const samplePoll: Poll = {
   id: "poll-1",
   question: "Favorite color?",
   createdAt: "2026-01-01T00:00:00.000Z",
+  accentColor: "teal",
   options: [
     { id: "opt-red", text: "Red", votes: 0 },
     { id: "opt-blue", text: "Blue", votes: 0 },

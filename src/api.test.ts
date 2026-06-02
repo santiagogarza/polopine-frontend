@@ -38,6 +38,7 @@ describe("api", () => {
         id: "p1",
         question: "Q?",
         createdAt: "2026-01-01T00:00:00.000Z",
+        accentColor: "orange",
         options: [],
       },
     ];
@@ -55,6 +56,7 @@ describe("api", () => {
       id: "new",
       question: "Lunch?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "orange",
       options: [
         { id: "a", text: "Pizza", votes: 0 },
         { id: "b", text: "Salad", votes: 0 },
@@ -72,12 +74,40 @@ describe("api", () => {
     expect(result).toEqual(poll);
   });
 
+  it("createPoll forwards selected accentColor when provided", async () => {
+    const { createPoll } = await loadApi();
+    const poll: Poll = {
+      id: "new",
+      question: "Lunch?",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "violet",
+      options: [
+        { id: "a", text: "Pizza", votes: 0 },
+        { id: "b", text: "Salad", votes: 0 },
+      ],
+    };
+    mockFetch.mockResolvedValue(jsonResponse(poll));
+
+    await createPoll("Lunch?", ["Pizza", "Salad"], "violet");
+
+    expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/polls", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: "Lunch?",
+        options: ["Pizza", "Salad"],
+        accentColor: "violet",
+      }),
+    });
+  });
+
   it("getPoll encodes poll id in URL", async () => {
     const { getPoll } = await loadApi();
     const poll: Poll = {
       id: "poll/id",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "orange",
       options: [],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -96,6 +126,7 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "orange",
       options: [{ id: "opt-1", text: "A", votes: 1 }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -121,6 +152,7 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "orange",
       options: [{ id: "opt-1", text: "A", votes: 1 }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));
@@ -140,6 +172,7 @@ describe("api", () => {
     const results: PollResults = {
       question: "Q?",
       totalVotes: 0,
+      accentColor: "orange",
       options: [],
     };
     mockFetch.mockResolvedValue(jsonResponse(results));
@@ -170,6 +203,7 @@ describe("api", () => {
       id: "p1",
       question: "Q?",
       createdAt: "2026-01-01T00:00:00.000Z",
+      accentColor: "orange",
       options: [{ id: "a", text: "A", votes: 0 }],
     };
     mockFetch.mockResolvedValue(jsonResponse(poll));

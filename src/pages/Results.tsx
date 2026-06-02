@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPollResults } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
-import type { PollResults } from "../types";
+import { pollAccentHex, type PollResults } from "../types";
 import { hasVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
@@ -111,7 +111,10 @@ export function Results() {
   }
 
   return (
-    <section className="page">
+    <section
+      className="page"
+      style={{ ["--accent" as string]: pollAccentHex(results.accentColor) }}
+    >
       <h1>{results.question}</h1>
       <p className="page-lead">
         Live results · {results.totalVotes}{" "}

@@ -6,6 +6,7 @@ import type { PollResults } from "../types";
 const sampleResults: PollResults = {
   question: "Favorite color?",
   totalVotes: 10,
+  accentColor: "orange",
   options: [
     { id: "a", text: "Red", votes: 6 },
     { id: "b", text: "Blue", votes: 4 },
