@@ -56,7 +56,7 @@ export function Home() {
     <section className="page page-home">
       <JoinQR />
 
-      <h2 className="home-section-title">Recent polls</h2>
+      <h2 className="home-section-title">Polls</h2>
 
       {loading ? <p className="page-lead">Loading recent polls…</p> : null}
 
