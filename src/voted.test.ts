@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearAllVoted,
   clearVoted,
+  getVotedOptionId,
   hasVoted,
   listVotedPollIds,
   markVoted,
@@ -13,9 +14,10 @@ describe("voted", () => {
   });
 
   it("tracks and clears vote markers", () => {
-    markVoted("poll-a");
-    markVoted("poll-b");
+    markVoted("poll-a", "opt-a");
+    markVoted("poll-b", "opt-b");
     expect(hasVoted("poll-a")).toBe(true);
+    expect(getVotedOptionId("poll-a")).toBe("opt-a");
     expect(listVotedPollIds()).toEqual(["poll-a", "poll-b"]);
 
     clearVoted("poll-a");

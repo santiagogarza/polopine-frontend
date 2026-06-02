@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getPollResults } from "../api";
+import { getPollResults, vote as voteApi } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
 import type { PollResults } from "../types";
-import { hasVoted } from "../voted";
+import { getVotedOptionId, hasVoted, markVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -14,6 +14,8 @@ export function Results() {
   const [results, setResults] = useState<PollResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [allowed, setAllowed] = useState(false);
+  const [votedOptionId, setVotedOptionId] = useState<string | null>(null);
+  const [switchingOptionId, setSwitchingOptionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -22,6 +24,7 @@ export function Results() {
       return;
     }
     setAllowed(hasVoted(id));
+    setVotedOptionId(getVotedOptionId(id));
   }, [id]);
 
   useEffect(() => {
@@ -58,6 +61,36 @@ export function Results() {
       window.clearInterval(intervalId);
     };
   }, [id, allowed]);
+
+  const handleSwitchVote = useCallback(
+    async (optionId: string) => {
+      if (!id || switchingOptionId) {
+        return;
+      }
+
+      setSwitchingOptionId(optionId);
+      setError(null);
+      try {
+        const updated = await voteApi(id, optionId);
+        markVoted(id, optionId);
+        setVotedOptionId(optionId);
+        const totalVotes = updated.options.reduce((sum, o) => sum + o.votes, 0);
+        const sortedOptions = [...updated.options].sort(
+          (a, b) => b.votes - a.votes,
+        );
+        setResults({
+          question: updated.question,
+          options: sortedOptions,
+          totalVotes,
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to change vote");
+      } finally {
+        setSwitchingOptionId(null);
+      }
+    },
+    [id, switchingOptionId],
+  );
 
   if (!id) {
     return (
@@ -120,7 +153,20 @@ export function Results() {
 
       <SharePollBar pollId={id} showVotedNotice />
 
-      <ResultsChart results={results} />
+      {error ? (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <ResultsChart
+        results={results}
+        votedOptionId={votedOptionId}
+        onSwitchVote={
+          votedOptionId ? (optionId) => void handleSwitchVote(optionId) : undefined
+        }
+        switchingOptionId={switchingOptionId}
+      />
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>

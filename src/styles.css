@@ -427,6 +427,54 @@ input[type="text"]:focus {
   transition: width 0.4s ease;
 }
 
+.results-row--voted .results-bar-fill {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.results-your-vote {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.results-switch-vote {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.results-row--switch-visible .results-switch-vote {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.results-switch-vote:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.results-switch-vote:disabled {
+  cursor: wait;
+}
+
 .join-qr {
   display: flex;
   flex-wrap: wrap;
