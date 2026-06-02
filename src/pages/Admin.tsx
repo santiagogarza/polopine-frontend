@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { saveAdminKey, useAdminAuth } from "../adminAuth";
 import {
   adminDeletePoll,
   adminResetAll,
@@ -13,25 +14,11 @@ import {
   listVotedPollIds,
 } from "../voted";
 
-const ADMIN_KEY_STORAGE = "polopine:admin-key";
-
-function loadAdminKey(): string {
-  return sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
-}
-
-function saveAdminKey(key: string): void {
-  if (key.trim()) {
-    sessionStorage.setItem(ADMIN_KEY_STORAGE, key.trim());
-  } else {
-    sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-  }
-}
-
 export function Admin() {
+  const { adminKey, isAuthenticated } = useAdminAuth();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [votedIds, setVotedIds] = useState<string[]>(() => listVotedPollIds());
-  const [adminKey, setAdminKey] = useState(loadAdminKey);
-  const [keyInput, setKeyInput] = useState(loadAdminKey);
+  const [keyInput, setKeyInput] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -69,7 +56,7 @@ export function Admin() {
 
   function handleSaveKey() {
     saveAdminKey(keyInput);
-    setAdminKey(keyInput.trim());
+    setKeyInput("");
     setMessage("Admin key saved for this tab session.");
     setError(null);
   }
@@ -187,27 +174,34 @@ export function Admin() {
         <h2 className="admin-section-title">Server actions</h2>
         <p className="admin-hint">
           Requires <code>ADMIN_API_KEY</code> on the API (Render env in prod).
+          Sign in from the footer, or enter a key here.
         </p>
-        <div className="admin-key-row">
-          <label className="admin-key-label" htmlFor="admin-key">
-            Admin key
-          </label>
-          <input
-            id="admin-key"
-            type="password"
-            className="admin-key-input"
-            value={keyInput}
-            onChange={(e) => setKeyInput(e.target.value)}
-            autoComplete="off"
-          />
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleSaveKey}
-          >
-            Save key
-          </button>
-        </div>
+        {isAuthenticated ? (
+          <p className="admin-hint admin-hint-authed">
+            Signed in with admin key for this tab.
+          </p>
+        ) : (
+          <div className="admin-key-row">
+            <label className="admin-key-label" htmlFor="admin-key">
+              Admin key
+            </label>
+            <input
+              id="admin-key"
+              type="password"
+              className="admin-key-input"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleSaveKey}
+            >
+              Save key
+            </button>
+          </div>
+        )}
 
         {polls.length === 0 ? (
           <p className="admin-hint">No polls on server.</p>

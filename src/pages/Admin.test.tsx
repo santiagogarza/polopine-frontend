@@ -74,6 +74,17 @@ describe("Admin", () => {
     );
   }
 
+  it("hides direct key input when already authenticated via sessionStorage", async () => {
+    sessionStorage.setItem("polopine:admin-key", "secret-key");
+
+    renderAdmin();
+
+    await screen.findByRole("heading", { name: "Admin" });
+
+    expect(screen.queryByLabelText("Admin key")).not.toBeInTheDocument();
+    expect(screen.getByText("Signed in with admin key for this tab.")).toBeInTheDocument();
+  });
+
   it("persists admin key to sessionStorage when saved", async () => {
     renderAdmin();
 
@@ -83,9 +94,7 @@ describe("Admin", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save key" }));
 
     expect(sessionStorage.getItem("polopine:admin-key")).toBe("secret-key");
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Admin key saved for this tab session.",
-    );
+    expect(await screen.findByText("Admin key saved for this tab session.")).toBeInTheDocument();
   });
 
   it("reset my view clears local vote markers", async () => {
