@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { getAccentStyle } from "../accentColors";
 import type { Poll } from "../types";
 
 interface VotedPollCardProps {
@@ -28,7 +29,8 @@ export function VotedPollCard({ poll }: VotedPollCardProps) {
   return (
     <button
       type="button"
-      className="voted-card"
+      className="voted-card poll-accent-scope"
+      style={getAccentStyle(poll.accentColor)}
       onClick={() => navigate(`/poll/${poll.id}/results`)}
     >
       <span className="voted-card-question">{poll.question}</span>

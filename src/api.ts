@@ -1,4 +1,5 @@
 import type { Poll, PollResults } from "./types";
+import type { AccentColor } from "./accentColors";
 import { getOrCreateVoterId } from "./voter";
 
 const API_URL =
@@ -29,11 +30,12 @@ export async function listPolls(): Promise<Poll[]> {
 export async function createPoll(
   question: string,
   options: string[],
+  accentColor: AccentColor,
 ): Promise<Poll> {
   const response = await fetch(`${API_URL}/polls`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question, options }),
+    body: JSON.stringify({ question, options, accentColor }),
   });
   return parseJson<Poll>(response);
 }

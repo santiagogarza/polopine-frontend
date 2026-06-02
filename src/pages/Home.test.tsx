@@ -15,6 +15,7 @@ const samplePolls: Poll[] = [
   {
     id: "poll-1",
     question: "How much of a Cursor ninja are you?",
+    accentColor: "rose",
     createdAt: "2026-06-01T12:00:00.000Z",
     options: [
       { id: "a", text: "Brand new", votes: 3 },
@@ -45,6 +46,10 @@ describe("Home", () => {
     expect(
       await screen.findByText("How much of a Cursor ninja are you?"),
     ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /How much of a Cursor ninja/ })).toHaveStyle({
+      "--accent": "#d23b78",
+      "--accent-contrast": "#ffffff",
+    });
     expect(screen.getByText("2 options · 10 votes")).toBeInTheDocument();
   });
 
@@ -67,5 +72,9 @@ describe("Home", () => {
 
     const topBar = screen.getByTestId("voted-bar-b");
     expect(topBar).toHaveStyle({ width: "70%" });
+    expect(topBar.closest(".voted-card")).toHaveStyle({
+      "--accent": "#d23b78",
+      "--accent-contrast": "#ffffff",
+    });
   });
 });

@@ -102,6 +102,18 @@ a:hover {
   line-height: 1.2;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .page-home > .join-qr {
   margin-top: 0;
 }
@@ -200,14 +212,16 @@ a:hover {
 }
 
 .field,
-.options-fieldset {
+.options-fieldset,
+.accent-fieldset {
   border: 0;
   margin: 0;
   padding: 0;
 }
 
 .field-label,
-.options-fieldset legend {
+.options-fieldset legend,
+.accent-fieldset legend {
   display: block;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -227,6 +241,44 @@ input[type="text"]:focus {
   outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
   outline-offset: 1px;
   border-color: var(--accent);
+}
+
+.accent-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.accent-swatch {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--swatch-color);
+  box-shadow:
+    0 0 0 1px var(--card-border),
+    0 1px 2px rgb(38 37 30 / 8%);
+  cursor: pointer;
+}
+
+.accent-swatch:hover,
+.accent-swatch:focus-visible {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--swatch-color) 35%, transparent),
+    0 6px 16px rgb(38 37 30 / 10%);
+}
+
+.accent-swatch:focus-visible {
+  outline: 2px solid var(--swatch-color);
+  outline-offset: 3px;
+}
+
+.accent-swatch-selected {
+  box-shadow:
+    0 0 0 3px var(--bg),
+    0 0 0 5px var(--swatch-color);
 }
 
 .option-row {
@@ -264,6 +316,10 @@ input[type="text"]:focus {
 .btn-primary {
   background: var(--accent);
   color: #fff;
+}
+
+.poll-accent-scope .btn-primary {
+  color: var(--accent-contrast);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -353,6 +409,12 @@ input[type="text"]:focus {
   box-shadow: 0 6px 20px rgb(38 37 30 / 7%);
 }
 
+.poll-accent-scope .option-card:hover:not(:disabled) {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--accent) 32%, transparent),
+    0 6px 20px rgb(38 37 30 / 7%);
+}
+
 .option-card:disabled {
   opacity: 0.7;
   cursor: wait;
@@ -425,6 +487,18 @@ input[type="text"]:focus {
   border-radius: 999px;
   min-width: 0;
   transition: width 0.4s ease;
+}
+
+.poll-card.poll-accent-scope,
+.voted-card.poll-accent-scope {
+  box-shadow: inset 0.25rem 0 0 var(--accent);
+}
+
+.poll-card.poll-accent-scope:hover,
+.voted-card.poll-accent-scope:hover {
+  box-shadow:
+    inset 0.25rem 0 0 var(--accent),
+    0 6px 20px rgb(38 37 30 / 7%);
 }
 
 .join-qr {
