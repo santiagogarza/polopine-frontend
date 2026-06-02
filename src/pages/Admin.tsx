@@ -6,26 +6,17 @@ import {
   adminResetPollVotes,
   listPolls,
 } from "../api";
+import {
+  loadAdminKey,
+  saveAdminKey,
+  subscribeToAdminAuthChange,
+} from "../adminAuth";
 import type { Poll } from "../types";
 import {
   clearAllVoted,
   clearVoted,
   listVotedPollIds,
 } from "../voted";
-
-const ADMIN_KEY_STORAGE = "polopine:admin-key";
-
-function loadAdminKey(): string {
-  return sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
-}
-
-function saveAdminKey(key: string): void {
-  if (key.trim()) {
-    sessionStorage.setItem(ADMIN_KEY_STORAGE, key.trim());
-  } else {
-    sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-  }
-}
 
 export function Admin() {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -49,6 +40,14 @@ export function Admin() {
     void refreshPolls();
   }, [refreshPolls]);
 
+  useEffect(() => {
+    return subscribeToAdminAuthChange(() => {
+      const savedKey = loadAdminKey();
+      setAdminKey(savedKey);
+      setKeyInput(savedKey);
+    });
+  }, []);
+
   function refreshVotedIds() {
     setVotedIds(listVotedPollIds());
   }
@@ -68,8 +67,9 @@ export function Admin() {
   }
 
   function handleSaveKey() {
-    saveAdminKey(keyInput);
-    setAdminKey(keyInput.trim());
+    const savedKey = saveAdminKey(keyInput);
+    setAdminKey(savedKey);
+    setKeyInput(savedKey);
     setMessage("Admin key saved for this tab session.");
     setError(null);
   }
@@ -118,7 +118,7 @@ export function Admin() {
     <section className="page page-admin">
       <h1>Admin</h1>
       <p className="page-lead">
-        Hidden demo controls. Not linked from the main UI.
+        Hidden demo controls for resetting local views and server vote state.
       </p>
 
       {message ? (
@@ -188,26 +188,32 @@ export function Admin() {
         <p className="admin-hint">
           Requires <code>ADMIN_API_KEY</code> on the API (Render env in prod).
         </p>
-        <div className="admin-key-row">
-          <label className="admin-key-label" htmlFor="admin-key">
-            Admin key
-          </label>
-          <input
-            id="admin-key"
-            type="password"
-            className="admin-key-input"
-            value={keyInput}
-            onChange={(e) => setKeyInput(e.target.value)}
-            autoComplete="off"
-          />
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleSaveKey}
-          >
-            Save key
-          </button>
-        </div>
+        {adminKey ? (
+          <p className="admin-hint">
+            Admin key is saved for this tab session. Use the footer to log out.
+          </p>
+        ) : (
+          <div className="admin-key-row">
+            <label className="admin-key-label" htmlFor="admin-key">
+              Admin key
+            </label>
+            <input
+              id="admin-key"
+              type="password"
+              className="admin-key-input"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleSaveKey}
+            >
+              Save key
+            </button>
+          </div>
+        )}
 
         {polls.length === 0 ? (
           <p className="admin-hint">No polls on server.</p>

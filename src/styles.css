@@ -96,6 +96,103 @@ a:hover {
   padding: 2rem 1.5rem 3rem;
 }
 
+.app-footer {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.admin-footer-auth {
+  display: inline-flex;
+}
+
+.admin-footer-auth-trigger {
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--fg) 26%, transparent);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.admin-footer-auth-trigger:hover,
+.admin-footer-auth-trigger:focus-visible {
+  color: var(--fg-muted);
+  text-decoration: underline;
+}
+
+.admin-auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(38 37 30 / 22%);
+}
+
+.admin-auth-dialog {
+  position: relative;
+  width: min(100%, 22rem);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: 0 18px 50px rgb(38 37 30 / 18%);
+  text-align: left;
+}
+
+.admin-auth-dialog h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.admin-auth-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admin-auth-close:hover,
+.admin-auth-close:focus-visible {
+  color: var(--fg);
+}
+
+.admin-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.admin-auth-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.admin-auth-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--fg);
+  font: inherit;
+}
+
+.admin-auth-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
 .page h1 {
   margin: 0 0 0.5rem;
   font-size: 1.75rem;

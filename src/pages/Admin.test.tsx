@@ -7,6 +7,7 @@ import {
   adminResetPollVotes,
   listPolls,
 } from "../api";
+import { ADMIN_KEY_STORAGE } from "../adminAuth";
 import type { Poll } from "../types";
 import { Admin } from "./Admin";
 
@@ -82,10 +83,21 @@ describe("Admin", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save key" }));
 
-    expect(sessionStorage.getItem("polopine:admin-key")).toBe("secret-key");
+    expect(sessionStorage.getItem(ADMIN_KEY_STORAGE)).toBe("secret-key");
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Admin key saved for this tab session.",
     );
+  });
+
+  it("hides the direct admin key input when already authenticated", async () => {
+    sessionStorage.setItem(ADMIN_KEY_STORAGE, "secret-key");
+
+    renderAdmin();
+
+    await screen.findByRole("heading", { name: "Admin" });
+
+    expect(screen.queryByLabelText("Admin key")).not.toBeInTheDocument();
+    expect(screen.getByText(/Admin key is saved/)).toBeInTheDocument();
   });
 
   it("reset my view clears local vote markers", async () => {
@@ -115,7 +127,7 @@ describe("Admin", () => {
   });
 
   it("runs reset votes when admin key is saved", async () => {
-    sessionStorage.setItem("polopine:admin-key", "secret-key");
+    sessionStorage.setItem(ADMIN_KEY_STORAGE, "secret-key");
     mockAdminResetPollVotes.mockResolvedValue({
       ...samplePolls[0],
       options: [
@@ -157,7 +169,7 @@ describe("Admin", () => {
   });
 
   it("delete poll calls adminDeletePoll with saved key", async () => {
-    sessionStorage.setItem("polopine:admin-key", "secret-key");
+    sessionStorage.setItem(ADMIN_KEY_STORAGE, "secret-key");
     mockAdminDeletePoll.mockResolvedValue();
 
     renderAdmin();

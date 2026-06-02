@@ -18,6 +18,7 @@ describe("api", () => {
     vi.stubGlobal("fetch", mockFetch);
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    vi.stubEnv("VITE_API_URL", undefined);
     localStorage.clear();
   });
 
@@ -271,8 +272,11 @@ describe("api", () => {
       }),
     );
 
-    await expect(verifyAdminKey("any-key")).rejects.toThrow(
-      "Too many requests",
-    );
+    const request = verifyAdminKey("any-key");
+
+    await expect(request).rejects.toThrow("Too many requests");
+    await expect(request).rejects.toMatchObject({
+      status: 429,
+    });
   });
 });

@@ -5,6 +5,15 @@ const API_URL =
   import.meta.env.VITE_API_URL?.replace(/\/$/, "") ??
   "http://localhost:8080";
 
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
 async function parseJson<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let message = response.statusText;
@@ -16,7 +25,10 @@ async function parseJson<T>(response: Response): Promise<T> {
     } catch {
       // ignore parse errors
     }
-    throw new Error(message || `Request failed (${response.status})`);
+    throw new ApiError(
+      message || `Request failed (${response.status})`,
+      response.status,
+    );
   }
   return response.json() as Promise<T>;
 }
