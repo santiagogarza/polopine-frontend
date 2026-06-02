@@ -1,20 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listPolls } from "../api";
 import { JoinQR } from "../components/JoinQR";
+import { PollSortMenu } from "../components/PollSortMenu";
 import { VotedPollCard } from "../components/VotedPollCard";
+import {
+  getStoredPollSort,
+  setStoredPollSort,
+  sortPolls,
+  totalVotes,
+  type PollSortOption,
+} from "../pollSort";
 import type { Poll } from "../types";
 import { hasVoted } from "../voted";
-
-function totalVotes(poll: Poll): number {
-  return poll.options.reduce((sum, option) => sum + option.votes, 0);
-}
 
 export function Home() {
   const navigate = useNavigate();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortOption, setSortOption] = useState<PollSortOption>(getStoredPollSort);
+
+  const sortedPolls = useMemo(
+    () => sortPolls(polls, sortOption),
+    [polls, sortOption],
+  );
+
+  function handleSortChange(option: PollSortOption) {
+    setSortOption(option);
+    setStoredPollSort(option);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +71,10 @@ export function Home() {
     <section className="page page-home">
       <JoinQR />
 
-      <h2 className="home-section-title">Polls</h2>
+      <div className="home-section-header">
+        <h2 className="home-section-title">Polls</h2>
+        <PollSortMenu value={sortOption} onChange={handleSortChange} />
+      </div>
 
       {loading ? <p className="page-lead">Loading recent polls…</p> : null}
 
@@ -71,8 +89,8 @@ export function Home() {
       ) : null}
 
       {!loading && !error && polls.length > 0 ? (
-        <ul className="poll-list">
-          {polls.map((poll) => {
+        <ul className="poll-list" key={sortOption}>
+          {sortedPolls.map((poll) => {
             if (hasVoted(poll.id)) {
               return (
                 <li key={poll.id}>
