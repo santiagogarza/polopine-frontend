@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getPollResults } from "../api";
+import { getPollResults, vote as voteApi } from "../api";
 import { ResultsChart } from "../components/ResultsChart";
 import { SharePollBar } from "../components/SharePollBar";
 import type { PollResults } from "../types";
-import { hasVoted } from "../voted";
+import { getVotedOptionId, hasVoted, markVoted } from "../voted";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -14,6 +14,8 @@ export function Results() {
   const [results, setResults] = useState<PollResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [allowed, setAllowed] = useState(false);
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [switchingOptionId, setSwitchingOptionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -21,8 +23,16 @@ export function Results() {
       setAllowed(false);
       return;
     }
-    setAllowed(hasVoted(id));
+    const voted = hasVoted(id);
+    setAllowed(voted);
+    setSelectedOptionId(voted ? getVotedOptionId(id) : null);
   }, [id]);
+
+  async function refreshResults(pollId: string) {
+    const data = await getPollResults(pollId);
+    setResults(data);
+    setError(null);
+  }
 
   useEffect(() => {
     if (!id || !allowed) {
@@ -58,6 +68,25 @@ export function Results() {
       window.clearInterval(intervalId);
     };
   }, [id, allowed]);
+
+  async function handleSwitchVote(optionId: string) {
+    if (!id || optionId === selectedOptionId || switchingOptionId) {
+      return;
+    }
+
+    setSwitchingOptionId(optionId);
+    setError(null);
+    try {
+      await voteApi(id, optionId);
+      markVoted(id, optionId);
+      setSelectedOptionId(optionId);
+      await refreshResults(id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Vote failed");
+    } finally {
+      setSwitchingOptionId(null);
+    }
+  }
 
   if (!id) {
     return (
@@ -120,7 +149,12 @@ export function Results() {
 
       <SharePollBar pollId={id} showVotedNotice />
 
-      <ResultsChart results={results} />
+      <ResultsChart
+        results={results}
+        selectedOptionId={selectedOptionId}
+        switchingOptionId={switchingOptionId}
+        onSwitchVote={(optionId) => void handleSwitchVote(optionId)}
+      />
 
       <p className="page-footer-link">
         <Link to="/">Back to polls</Link>

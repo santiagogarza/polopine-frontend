@@ -63,7 +63,7 @@ export function Vote() {
     setError(null);
     try {
       await voteApi(id, optionId);
-      markVoted(id);
+      markVoted(id, optionId);
       navigate(`/poll/${id}/results`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Vote failed");
