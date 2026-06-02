@@ -26,7 +26,7 @@ const samplePolls: Poll[] = [
 const sortablePolls: Poll[] = [
   {
     id: "poll-old",
-    question: "Zebra snacks",
+    question: "Banana snacks",
     createdAt: "2026-06-01T12:00:00.000Z",
     options: [
       { id: "a", text: "Hay", votes: 1 },
@@ -35,20 +35,20 @@ const sortablePolls: Poll[] = [
   },
   {
     id: "poll-new",
-    question: "Apple favorites",
+    question: "Zebra favorites",
     createdAt: "2026-06-03T12:00:00.000Z",
     options: [
-      { id: "a", text: "Red", votes: 3 },
-      { id: "b", text: "Green", votes: 5 },
+      { id: "a", text: "Red", votes: 1 },
+      { id: "b", text: "Green", votes: 2 },
     ],
   },
   {
     id: "poll-middle",
-    question: "Mango ripeness",
+    question: "Apple ripeness",
     createdAt: "2026-06-02T12:00:00.000Z",
     options: [
-      { id: "a", text: "Firm", votes: 1 },
-      { id: "b", text: "Soft", votes: 2 },
+      { id: "a", text: "Firm", votes: 3 },
+      { id: "b", text: "Soft", votes: 5 },
     ],
   },
 ];
@@ -114,47 +114,83 @@ describe("Home", () => {
 
     renderHome();
 
-    await screen.findByText("Apple favorites");
+    await screen.findByText("Zebra favorites");
     expect(pollOrder()).toEqual([
-      "Apple favorites",
-      "Mango ripeness",
-      "Zebra snacks",
+      "Zebra favorites",
+      "Apple ripeness",
+      "Banana snacks",
     ]);
 
     fireEvent.click(
       screen.getByRole("button", { name: "Sort polls, current: Newest" }),
     );
 
-    expect(screen.getByRole("menu")).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: "Newest" })).toHaveAttribute(
-      "aria-checked",
+    expect(
+      screen.getByRole("group", { name: "Sort polls" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Newest" })).toHaveAttribute(
+      "aria-pressed",
       "true",
     );
     expect(
-      screen.getByRole("menuitemradio", { name: "Oldest" }),
+      screen.getByRole("button", { name: "Oldest" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("menuitemradio", { name: "Most votes" }),
+      screen.getByRole("button", { name: "Most votes" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("menuitemradio", { name: "Least votes" }),
+      screen.getByRole("button", { name: "Least votes" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("menuitemradio", { name: "Alphabetical" }),
+      screen.getByRole("button", { name: "Alphabetical" }),
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("menuitemradio", { name: "Least votes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Least votes" }));
 
     expect(localStorage.getItem("polopine:poll-sort")).toBe("least-votes");
-    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(screen.queryByRole("group")).not.toBeInTheDocument();
     expect(pollOrder()).toEqual([
-      "Zebra snacks",
-      "Mango ripeness",
-      "Apple favorites",
+      "Banana snacks",
+      "Zebra favorites",
+      "Apple ripeness",
     ]);
     expect(
       screen.getByRole("button", { name: "Sort polls, current: Least votes" }),
     ).toBeInTheDocument();
+  });
+
+  it("sorts polls by most votes and alphabetically", async () => {
+    mockListPolls.mockResolvedValue(sortablePolls);
+
+    renderHome();
+
+    await screen.findByText("Zebra favorites");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Sort polls, current: Newest" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Most votes" }));
+
+    expect(pollOrder()).toEqual([
+      "Apple ripeness",
+      "Zebra favorites",
+      "Banana snacks",
+    ]);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Sort polls, current: Most votes" }),
+    );
+    expect(screen.getByRole("button", { name: "Most votes" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Alphabetical" }));
+
+    expect(pollOrder()).toEqual([
+      "Apple ripeness",
+      "Banana snacks",
+      "Zebra favorites",
+    ]);
   });
 
   it("uses the locally saved sort option on reload", async () => {
@@ -163,11 +199,11 @@ describe("Home", () => {
 
     renderHome();
 
-    await screen.findByText("Apple favorites");
+    await screen.findByText("Zebra favorites");
     expect(pollOrder()).toEqual([
-      "Zebra snacks",
-      "Mango ripeness",
-      "Apple favorites",
+      "Banana snacks",
+      "Apple ripeness",
+      "Zebra favorites",
     ]);
     expect(
       screen.getByRole("button", { name: "Sort polls, current: Oldest" }),

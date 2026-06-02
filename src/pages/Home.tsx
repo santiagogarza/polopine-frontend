@@ -157,7 +157,6 @@ export function Home() {
             type="button"
             className="poll-sort-trigger"
             aria-label={`Sort polls, current: ${selectedSortLabel}`}
-            aria-haspopup="menu"
             aria-expanded={sortMenuOpen}
             onClick={() => setSortMenuOpen((open) => !open)}
           >
@@ -176,14 +175,13 @@ export function Home() {
             </svg>
           </button>
           {sortMenuOpen ? (
-            <div className="poll-sort-menu" role="menu" aria-label="Sort polls">
+            <div className="poll-sort-menu" role="group" aria-label="Sort polls">
               {sortOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   className="poll-sort-option"
-                  role="menuitemradio"
-                  aria-checked={option.value === sortOption}
+                  aria-pressed={option.value === sortOption}
                   onClick={() => chooseSortOption(option.value)}
                 >
                   <span>{option.label}</span>
